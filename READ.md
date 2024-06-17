@@ -15,9 +15,9 @@
 
 Vous pouvez créer un nouveau projet avec le Nest CLI en utilisant la commande suivante :
 
-$ npm i -g @nestjs/cli       
+> $ npm i -g @nestjs/cli       
 
-$ nest new nom-du-projet
+> $ nest new nom-du-projet
 
 La CLI va créer pour nous un nouveau projet dans le dossier nom-du-projet :
 
