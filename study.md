@@ -1,7 +1,3 @@
-# 👨🏼‍🤝‍👨🏼 Participants
-  - FOUMBI DJOMO Ranyl Josué
-  - MANFO JIENGAP Rosvalde Florient
-
 # `Étude de faisabilité`
 
 # 1. NestJS
@@ -67,4 +63,3 @@ Cette combinaison peut être pertinente pour les raisons suivantes :
 - **Performance** : GraphQL permet de récupérer uniquement les données nécessaires, ce qui peut améliorer les performances.
 - **Flexibilité** : Vous pouvez ajouter ou modifier des champs sans impacter les clients existants.
 - **Scalabilité** : REDIS, utilisé pour la mise en cache, peut améliorer la scalabilité de l’application et haute disponibilité des données.
-
