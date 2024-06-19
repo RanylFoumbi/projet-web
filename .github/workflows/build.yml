@@ -16,14 +16,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Change directory to back
+        run: cd backend
+        working-directory: ./backend
+
       - name: Install dependencies
         run: npm install
+        working-directory: ./backend
 
       - name: lint, format
         run: npm run lint && npm run format 
 
       # - name: Run tests
       #   run: npm run test
+      #   working-directory: ./backend
 
       - name: Build project
         run: npm run build
+        working-directory: ./backend
