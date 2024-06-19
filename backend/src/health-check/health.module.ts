@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 // import { HealthController } from './health.controller';
 import { BullModule } from '@nestjs/bull';
-import { QueueName } from 'backend/src/types/queue';
+import { QueueName } from '../types/queue';
 import { HealthConsumer } from './health.consumer';
 import { HealthService } from './health.service';
 import { HealthResolver } from './health.resolver';

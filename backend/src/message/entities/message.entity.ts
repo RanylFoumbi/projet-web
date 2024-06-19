@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { RoomModel } from 'backend/src/room/entities/room.entity';
-import { UserModel } from 'backend/src/user/entity/user.entity';
+import { RoomModel } from '../../room/entities/room.entity';
+import { UserModel } from '../../user/entity/user.entity';
 
 @ObjectType({ description: 'Message model' })
 export class MessageModel {
