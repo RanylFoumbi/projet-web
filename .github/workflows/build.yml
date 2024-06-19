@@ -16,11 +16,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: lint, format
-        run: npm run lint && npm run format
-
       - name: Install dependencies
-        run: npm install 
+        run: npm install
+
+      - name: lint, format
+        run: npm run lint && npm run format 
 
       # - name: Run tests
       #   run: npm run test
