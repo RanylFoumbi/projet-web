@@ -6,6 +6,7 @@ import { HealthService } from './health.service';
 import { HealthResolver } from './health.resolver';
 import { QueueName } from 'src/types/queue';
 
+
 @Module({
   imports: [
     BullModule.registerQueue({
