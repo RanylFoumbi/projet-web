@@ -45,8 +45,9 @@ export class QueueManagerService {
 
 
   private sendMessageProcessor(job: any, queueName: string): Promise<void> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       setTimeout(() => {
+        console.log('==============================================> Message sent')
       }, 5000);
       const oldMessages = await this.redisService.get(queueName);
       if (oldMessages) {
@@ -59,7 +60,7 @@ export class QueueManagerService {
   }
 
   private fetchMessagesProcessor(job: any): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       console.log(job.data);
       resolve();
     });
