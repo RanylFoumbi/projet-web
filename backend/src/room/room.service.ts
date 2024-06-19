@@ -6,7 +6,9 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class RoomService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService
+  ) {}
   private rooms: RoomModel[] = [
     {
       id: '1',
