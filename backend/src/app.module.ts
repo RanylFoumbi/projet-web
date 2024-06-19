@@ -11,7 +11,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '../.env',
     }),
     AppRoutingModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
