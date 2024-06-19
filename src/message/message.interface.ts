@@ -1,10 +1,11 @@
+import { IRoom } from 'src/room/room.interface';
 import { IUser } from 'src/user/user.interface';
 
-export type IMessage = {
+export class IMessage {
   id: string;
-  content: string;
+  room: IRoom;
   sender: IUser;
-  roomId: string;
-  createdAt: Date;
-  updateAt: Date;
-};
+  content?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

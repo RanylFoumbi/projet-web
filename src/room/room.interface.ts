@@ -1,9 +1,12 @@
 import { IMessage } from 'src/message/message.interface';
+import { IUser } from 'src/user/user.interface';
 
-export type IRoom = {
+export class IRoom {
   id: string;
-  updateAt: Date;
-  createdAt: Date;
+  name: string;
+  updatedAt?: Date;
+  createdAt?: Date;
   creatorId: string;
+  participants: IUser[];
   messages: IMessage[];
-};
+}
