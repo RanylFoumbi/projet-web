@@ -17,13 +17,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+
       - name: Install dependencies
         run: npm install
         working-directory: ./backend
 
       - name: lint, format
         run: npm run lint && npm run format 
+        working-directory: ./backend
 
       # - name: Run tests
       #   run: npm run test
