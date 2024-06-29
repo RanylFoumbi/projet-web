@@ -9,10 +9,9 @@ export class UserResolver {
   @Mutation(() => UserModel)
   async createUser(
     @Args('username') username: string,
-    @Args('email') email: string,
     @Args('password') password: string,
   ): Promise<UserModel> {
-    return this.userService.createUser({ username, email, password });
+    return this.userService.createUser({ username, password });
   }
 
   @Query(() => UserModel)

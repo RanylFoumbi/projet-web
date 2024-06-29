@@ -7,16 +7,35 @@ export class QueueManagerService {
   constructor(
     private readonly redisService: RedisService
   ){
-
+    this.init();
   }
+
+  private async init() {
+    const queuesJson = await this.redisService.get('queuesMap');
+    if (queuesJson) {
+      const queuesArray = JSON.parse(queuesJson);
+      for (const queue of queuesArray) {
+        this.setupWorkers(queue);
+      }
+    }
+  }
+
   private queues: Map<string, Queue> = new Map();
 
   async getQueue(name: string): Promise<Queue> {
-    if (this.queues.has(name)) {
-      return this.queues.get(name);
-    }
+    console.log('==============================================> Getting queue from', this.queues, name)
+    return this.queues.get(name);
+  }
 
-    const queue = new Queue(name
+  async saveQueuesMap(queuesMap: Map<string, Queue>) {
+    const queuesArray = Array.from(queuesMap.keys())
+    const queuesJson = JSON.stringify(queuesArray);
+    await this.redisService.set('queuesMap', queuesJson);
+  }
+
+  async createQueue(name: string): Promise<Queue> {
+    const queue = new Queue(
+      name
       , {
         connection: {
           host: process.env.REDIS_HOST,
@@ -27,6 +46,7 @@ export class QueueManagerService {
   
     this.setupWorkers(name);
     this.queues.set(name, queue);
+    await this.saveQueuesMap(this.queues);
     return queue;
   }
 

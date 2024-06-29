@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MessageModel } from './entities/message.entity';
 import { UserService } from 'src/user/user.service';
-import { RoomService } from 'src/room/room.service';
 import { QueueManagerService } from 'src/queueManager/queueManager.service';
 import { RedisService } from 'src/queueManager/redis.service';
 
@@ -9,34 +8,31 @@ import { RedisService } from 'src/queueManager/redis.service';
 export class MessageService {
   constructor(
     private readonly userService: UserService,
-    private readonly roomService: RoomService,
     private readonly queueManagerService: QueueManagerService,
     private readonly redisService: RedisService,
   ) {}
 
   private messages: MessageModel[] = [];
 
-  async getRoomMessages(roomId: string): Promise<MessageModel[]> {
-    console.log(`Messages for room ${roomId}`);
-    const cacheKey = `ROOM_MESSAGES_${roomId}`;
-    const cachedMessages = await this.redisService.get(cacheKey);
+  async getConversationMessages(convId: string): Promise<MessageModel[]> {
+    const cachedMessages = await this.redisService.get(convId);
     if (cachedMessages) {
       return JSON.parse(cachedMessages);
     }
-    const romMessages = this.messages.filter(
-      (message) => message.room.id === roomId,
+    const convMessages = this.messages.filter(
+      (message) => message.conversation.id === convId,
     );
-    await this.redisService.set(cacheKey, JSON.stringify(romMessages));
-    return romMessages
+    await this.redisService.set(convId, JSON.stringify(convMessages));
+    return convMessages
   }
 
   async sendMessage(
-    roomId: string,
+    convId: string,
     senderId: string,
     content: string,
   ): Promise<MessageModel> {
     console.log(
-      `Message sent to room ${roomId} by ${senderId} with content: ${content}`,
+      `Message sent to conversation ${convId} by ${senderId} with content: ${content}`,
     );
 
     // const room = await this.roomService.getRoom(roomId);
@@ -49,8 +45,8 @@ export class MessageService {
     newMessage.updatedAt = new Date();
     //  newMessage.room = room;
 
-    const queueName = `ROOM_${roomId}`;
-    const queue = await this.queueManagerService.getQueue(queueName);
+    const queue = await this.queueManagerService.getQueue(convId);
+    console.log('Queue', queue); 
     
     await queue.add('sendMessage', newMessage);
     this.messages.push(newMessage);
