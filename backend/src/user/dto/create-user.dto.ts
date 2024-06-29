@@ -6,8 +6,5 @@ export class CreateUserDto {
   username: string;
 
   @Field()
-  email: string;
-
-  @Field()
   password: string;
 }

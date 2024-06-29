@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Conversation model"""
+type ConversationModel {
+  createdAt: String
+  firstParticipant: ID!
+  id: ID!
+  messages: [MessageModel!]!
+  secondParticipant: ID!
+  updatedAt: String
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -10,51 +20,35 @@ scalar DateTime
 """Message model"""
 type MessageModel {
   content: String!
+  conversation: ConversationModel!
   createdAt: DateTime!
   id: ID!
-  room: RoomModel!
   sender: UserModel!
   updatedAt: DateTime!
 }
 
 type Mutation {
-  addParticipant(participantId: ID!, roomId: ID!): RoomModel!
-  createRoom(creatorId: ID!, name: String!, participantIds: [ID!]!): RoomModel!
-  createUser(email: String!, password: String!, username: String!): UserModel!
-  deleteRoom(roomId: ID!): RoomModel!
-  removeParticipant(participantId: ID!, roomId: ID!): RoomModel!
-  sendMessage(content: String!, roomId: String!, senderId: String!): MessageModel!
+  createConversation(firstParticipant: ID!, secondParticipant: ID!): ConversationModel!
+  createUser(password: String!, username: String!): UserModel!
+  deleteConversation(convId: ID!): ConversationModel!
+  sendMessage(content: String!, convId: String!, senderId: String!): MessageModel!
 }
 
 type Query {
   getAllUsers: [UserModel!]!
-  getRoom(roomId: ID!): RoomModel!
-  getRoomMessages(roomId: ID!): [MessageModel!]!
+  getConversationMessages(convId: ID!): [MessageModel!]!
   getUserById(id: String!): UserModel!
   getUserByUsername(username: String!): UserModel!
-  getUserRooms(userId: ID!): [RoomModel!]!
+  getUserConversations(userId: ID!): [ConversationModel!]!
   health: String!
-}
-
-"""Room model"""
-type RoomModel {
-  createdAt: String
-  creatorId: ID!
-  id: ID!
-  messages: [MessageModel!]!
-  name: String!
-  participants: [UserModel!]!
-  updatedAt: String
 }
 
 """User model"""
 type UserModel {
+  conversations: [ConversationModel!]
   createdAt: DateTime
-  email: String!
   id: ID!
   password: String
-  profileImg: String
-  rooms: [RoomModel!]!
   updatedAt: DateTime
   username: String!
 }

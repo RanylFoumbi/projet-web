@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { RoomModel } from 'src/room/entities/room.entity';
+import { ConversationModel } from 'src/conversation/entities/conversation.entity';
 
 @ObjectType({ description: 'User model' })
 export class UserModel {
@@ -12,14 +12,8 @@ export class UserModel {
   @Field(() => String, { nullable: true })
   password: string;
 
-  @Field(() => String, { nullable: true })
-  profileImg: string;
-
-  @Field(() => String)
-  email: string;
-
-  @Field(() => [RoomModel])
-  rooms: RoomModel[];
+  @Field(() => [ConversationModel], { nullable: true })
+  conversations: ConversationModel[];
 
   @Field(() => Date, { nullable: true })
   createdAt: Date;

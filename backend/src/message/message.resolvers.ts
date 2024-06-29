@@ -7,18 +7,18 @@ export class MessageResolver {
   constructor(private readonly messageService: MessageService) {}
 
   @Query(() => [MessageModel])
-  async getRoomMessages(
-    @Args('roomId', { type: () => ID }) roomId: string,
+  async getConversationMessages(
+    @Args('convId', { type: () => ID }) convId: string,
   ): Promise<MessageModel[]> {
-    return this.messageService.getRoomMessages(roomId);
+    return this.messageService.getConversationMessages(convId);
   }
 
   @Mutation(() => MessageModel)
   async sendMessage(
-    @Args('roomId') roomId: string,
+    @Args('convId') convId: string,
     @Args('senderId') senderId: string,
     @Args('content') content: string,
   ): Promise<MessageModel> {
-    return this.messageService.sendMessage(roomId, senderId, content);
+    return this.messageService.sendMessage(convId, senderId, content);
   }
 }
