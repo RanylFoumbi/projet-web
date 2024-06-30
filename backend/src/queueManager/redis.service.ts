@@ -1,41 +1,52 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { RedisClient } from 'bullmq';
-import Redis from 'ioredis';
- 
+import { Redis } from 'ioredis';
+
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-  private redisClient: RedisClient;
- 
-  onModuleInit() {
-    this.initializeRedisClient();
-  }
- 
-  onModuleDestroy() {
-    this.redisClient.quit();
+  private redisClient: Redis;
+
+  constructor() {
+    this.redisClient = new Redis({
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT),
+    });
   }
 
-  private initializeRedisClient() {
-    if (!this.redisClient) {
-      this.redisClient = new Redis({
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT),
-      });
+  async onModuleInit(): Promise<void> {
+    if (this.redisClient.status === 'end') {
+      await this.redisClient.connect();
+      console.log('Redis client connected successfully');
     }
-    console.log(this.redisClient)
   }
- 
-  async get(key: string): Promise<string> {
-    this.initializeRedisClient()
-    return this.redisClient.get(key);
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redisClient.quit();
   }
- 
+
+  async get(key: string): Promise<string | null> {
+    try {
+      return await this.redisClient.get(key);
+    } catch (error) {
+      console.error(`Error getting key ${key} from Redis`, error);
+      throw error;
+    }
+  }
+
   async set(key: string, value: string): Promise<void> {
-    this.initializeRedisClient()
-    await this.redisClient.set(key, value);
+    try {
+      await this.redisClient.set(key, value);
+    } catch (error) {
+      console.error(`Error setting key ${key} in Redis`, error);
+      throw error;
+    }
   }
- 
+
   async del(key: string): Promise<void> {
-    this.initializeRedisClient()
-    await this.redisClient.del(key);
+    try {
+      await this.redisClient.del(key);
+    } catch (error) {
+      console.error(`Error deleting key ${key} from Redis`, error);
+      throw error;
+    }
   }
 }

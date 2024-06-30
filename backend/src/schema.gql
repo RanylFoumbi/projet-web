@@ -3,13 +3,18 @@
 # ------------------------------------------------------
 
 """Conversation model"""
-type ConversationModel {
+type Conversation {
   createdAt: String
-  firstParticipant: ID!
   id: ID!
-  messages: [MessageModel!]!
-  secondParticipant: ID!
+  messages: [Message!]!
+  participants: [User!]!
   updatedAt: String
+  users: User!
+}
+
+input CreateConversationDto {
+  name: String!
+  users: [ID!]!
 }
 
 """
@@ -17,36 +22,69 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+type LoginResponse {
+  user: User!
+}
+
 """Message model"""
-type MessageModel {
+type Message {
   content: String!
-  conversation: ConversationModel!
+  conversation: Conversation!
   createdAt: DateTime!
   id: ID!
-  sender: UserModel!
+  sender: User!
   updatedAt: DateTime!
 }
 
+"""Message input model"""
+input MessageInput {
+  content: String!
+  conversation: ID!
+  sender: ID!
+}
+
 type Mutation {
-  createConversation(firstParticipant: ID!, secondParticipant: ID!): ConversationModel!
-  createUser(password: String!, username: String!): UserModel!
-  deleteConversation(convId: ID!): ConversationModel!
-  sendMessage(content: String!, convId: String!, senderId: String!): MessageModel!
+  createConversation(convInput: CreateConversationDto!): Conversation!
+  deleteConversation(convId: ID!): Conversation!
+  login(loginInput: LoginDto!): LoginResponse!
+  logout: String!
+  refreshToken: String!
+  register(registerInput: RegisterDto!): RegisterResponse!
+  sendMessage(messageInput: MessageInput!): Message!
+  updateProfile(file: Upload, username: String!): User!
 }
 
 type Query {
-  getAllUsers: [UserModel!]!
-  getConversationMessages(convId: ID!): [MessageModel!]!
-  getUserById(id: String!): UserModel!
-  getUserByUsername(username: String!): UserModel!
-  getUserConversations(userId: ID!): [ConversationModel!]!
+  getConversationMessages(convId: ID!): [Message!]!
+  getUserConversations(userId: ID!): [Conversation!]!
   health: String!
+  healthCheck: String!
 }
 
+input RegisterDto {
+  confirmPassword: String!
+  email: String!
+  password: String!
+  username: String!
+}
+
+type RegisterResponse {
+  user: User
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 """User model"""
-type UserModel {
-  conversations: [ConversationModel!]
+type User {
+  conversations: [Conversation!]
   createdAt: DateTime
+  email: String!
   id: ID!
   password: String
   updatedAt: DateTime

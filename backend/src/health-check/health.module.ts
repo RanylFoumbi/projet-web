@@ -12,7 +12,6 @@ import { HealthResolver } from './health.resolver';
       name: QueueName.HEALTH,
     }),
   ],
-  // controllers: [HealthController],
   providers: [HealthConsumer, HealthService, HealthResolver],
 })
 export class HealthModule {}

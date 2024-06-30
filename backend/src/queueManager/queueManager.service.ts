@@ -1,49 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Queue, Worker } from 'bullmq';
 import { RedisService } from './redis.service';
 
 @Injectable()
-export class QueueManagerService {
-  constructor(
-    private readonly redisService: RedisService
-  ){
-    this.init();
+export class QueueManagerService implements OnModuleInit {
+  private queues: Map<string, Queue> = new Map();
+
+  constructor(private readonly redisService: RedisService) {}
+
+  async onModuleInit() {
+    await this.init();
   }
 
   private async init() {
-    const queuesJson = await this.redisService.get('queuesMap');
-    if (queuesJson) {
-      const queuesArray = JSON.parse(queuesJson);
-      for (const queue of queuesArray) {
-        this.setupWorkers(queue);
+    try {
+      const queuesJson = await this.redisService.get('queuesMap');
+      if (queuesJson) {
+        const queuesArray = JSON.parse(queuesJson);
+        queuesArray.forEach((queue) => this.setupWorkers(queue));
       }
+    } catch (error) {
+      console.error('Failed to initialize queues:', error);
     }
   }
 
-  private queues: Map<string, Queue> = new Map();
-
   async getQueue(name: string): Promise<Queue> {
-    console.log('==============================================> Getting queue from', this.queues, name)
-    return this.queues.get(name);
+    let queue = this.queues.get(name);
+    if (!queue) {
+      queue = await this.createQueue(name);
+    }
+    return queue;
   }
 
   async saveQueuesMap(queuesMap: Map<string, Queue>) {
-    const queuesArray = Array.from(queuesMap.keys())
+    const queuesArray = Array.from(queuesMap.keys());
     const queuesJson = JSON.stringify(queuesArray);
     await this.redisService.set('queuesMap', queuesJson);
   }
 
   async createQueue(name: string): Promise<Queue> {
-    const queue = new Queue(
-      name
-      , {
-        connection: {
-          host: process.env.REDIS_HOST,
-          port: parseInt(process.env.REDIS_PORT),
-        },
-      }
-    );
-  
+    const queue = new Queue(name, {
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+      },
+    });
+
     this.setupWorkers(name);
     this.queues.set(name, queue);
     await this.saveQueuesMap(this.queues);
@@ -51,38 +53,46 @@ export class QueueManagerService {
   }
 
   private setupWorkers(queueName: string): void {
-    new Worker(queueName, (job) =>{
-      if(job.name === 'sendMessage'){
+    new Worker(
+      queueName,
+      async (job) => {
+        if (job.name === 'sendMessage') {
           return this.sendMessageProcessor(job, queueName);
-      } else {
+        } else {
           return this.fetchMessagesProcessor(job);
-      }
-  }, {connection:  {
-      host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT),
-  }});
+        }
+      },
+      {
+        connection: {
+          host: process.env.REDIS_HOST,
+          port: parseInt(process.env.REDIS_PORT),
+        },
+      },
+    );
   }
 
-
-  private sendMessageProcessor(job: any, queueName: string): Promise<void> {
-    return new Promise(async (resolve) => {
-      setTimeout(() => {
-        console.log('==============================================> Message sent')
-      }, 5000);
-      const oldMessages = await this.redisService.get(queueName);
-      if (oldMessages) {
-        await this.redisService.set(queueName, JSON.stringify([...oldMessages, job.data]));
-      } else {
-        await this.redisService.set(queueName, JSON.stringify([job.data]));
-      }
-      resolve();
-    });
+  private async sendMessageProcessor(
+    job: any,
+    queueName: string,
+  ): Promise<void> {
+    const oldMessagesJson = await this.redisService.get(queueName);
+    const oldMessages = oldMessagesJson ? JSON.parse(oldMessagesJson) : [];
+    await this.redisService.set(
+      queueName,
+      JSON.stringify([...oldMessages, job.data]),
+    );
   }
 
-  private fetchMessagesProcessor(job: any): Promise<void> {
-    return new Promise((resolve) => {
-      console.log(job.data);
-      resolve();
-    });
+  private async fetchMessagesProcessor(job: any): Promise<void> {
+    console.log(job.data);
+  }
+
+  async deleteQueue(name: string) {
+    const queue = this.queues.get(name);
+    if (queue) {
+      await queue.close();
+      this.queues.delete(name);
+      await this.saveQueuesMap(this.queues);
+    }
   }
 }
