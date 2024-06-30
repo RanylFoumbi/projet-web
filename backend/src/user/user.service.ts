@@ -1,38 +1,61 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
-import { UserModel } from './entity/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+import * as fs from 'fs';
+import { join } from 'path';
+import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService {
-  constructor() {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  private users: UserModel[] = [
-    {
-      id: '1',
-      username: 'ra',
-      email: '',
-      password: '123',
-      profileImg: 'https://example.com',
-      rooms: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ];
+  async updateProfile(userId: string, username: string, avatarUrl: string) {
+    if (avatarUrl) {
+      const oldUser = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      const updatedUser = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          username,
+          avatarUrl,
+        },
+      });
 
-  async findUserById(id: string) {
-    return this.users.find((user) => user.id === id);
+      if (oldUser.avatarUrl) {
+        const imageName = oldUser.avatarUrl.split('/').pop();
+        const imagePath = join(
+          __dirname,
+          '..',
+          '..',
+          'public',
+          'images',
+          imageName,
+        );
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+
+      return updatedUser;
+    }
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        username,
+      },
+    });
   }
 
-  async findUserByUsername(username: string) {
-    return this.users.find((user) => user.username === username);
-  }
-
-  async createUser(createUserInput: CreateUserDto) {
-    return null;
-  }
-
-  async findAllUsers() {
-    return this.users;
+  async getUserById(id: string): Promise<User> {
+    let user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw new BadRequestException('User no longer exists');
+    }
+    return {
+      ...user,
+      conversations: [],
+    };
   }
 }
