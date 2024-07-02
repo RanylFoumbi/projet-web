@@ -1,10 +1,13 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { RoomModel } from 'src/room/entities/room.entity';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
 
 @ObjectType({ description: 'User model' })
-export class UserModel {
+export class User {
   @Field(() => ID)
   id: string;
+
+  @Field()
+  email?: string;
 
   @Field(() => String)
   username: string;
@@ -12,14 +15,8 @@ export class UserModel {
   @Field(() => String, { nullable: true })
   password: string;
 
-  @Field(() => String, { nullable: true })
-  profileImg: string;
-
-  @Field(() => String)
-  email: string;
-
-  @Field(() => [RoomModel])
-  rooms: RoomModel[];
+  @Field(() => [Conversation], { nullable: true })
+  conversations: Conversation[];
 
   @Field(() => Date, { nullable: true })
   createdAt: Date;

@@ -2,59 +2,91 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Conversation model"""
+type Conversation {
+  createdAt: String
+  id: ID!
+  messages: [Message!]!
+  participants: [User!]!
+  updatedAt: String
+  users: User!
+}
+
+input CreateConversationDto {
+  name: String!
+  users: [ID!]!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
 
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+type LoginResponse {
+  user: User!
+}
+
 """Message model"""
-type MessageModel {
+type Message {
   content: String!
+  conversation: Conversation!
   createdAt: DateTime!
   id: ID!
-  room: RoomModel!
-  sender: UserModel!
+  sender: User!
   updatedAt: DateTime!
 }
 
+"""Message input model"""
+input MessageInput {
+  content: String!
+  conversation: ID!
+  sender: ID!
+}
+
 type Mutation {
-  addParticipant(participantId: ID!, roomId: ID!): RoomModel!
-  createRoom(creatorId: ID!, name: String!, participantIds: [ID!]!): RoomModel!
-  createUser(email: String!, password: String!, username: String!): UserModel!
-  deleteRoom(roomId: ID!): RoomModel!
-  removeParticipant(participantId: ID!, roomId: ID!): RoomModel!
-  sendMessage(content: String!, roomId: String!, senderId: String!): MessageModel!
+  createConversation(convInput: CreateConversationDto!): Conversation!
+  deleteConversation(convId: ID!): Conversation!
+  login(loginInput: LoginDto!): LoginResponse!
+  logout: String!
+  refreshToken: String!
+  register(registerInput: RegisterDto!): RegisterResponse!
+  sendMessage(messageInput: MessageInput!): Message!
+  updateProfile(file: Upload, username: String!): User!
 }
 
 type Query {
-  getAllUsers: [UserModel!]!
-  getRoom(roomId: ID!): RoomModel!
-  getRoomMessages(roomId: ID!): [MessageModel!]!
-  getUserById(id: String!): UserModel!
-  getUserByUsername(username: String!): UserModel!
-  getUserRooms(userId: ID!): [RoomModel!]!
+  getConversationMessages(convId: ID!): [Message!]!
+  getUserConversations(userId: ID!): [Conversation!]!
   health: String!
+  healthCheck: String!
 }
 
-"""Room model"""
-type RoomModel {
-  createdAt: String
-  creatorId: ID!
-  id: ID!
-  messages: [MessageModel!]!
-  name: String!
-  participants: [UserModel!]!
-  updatedAt: String
+input RegisterDto {
+  confirmPassword: String!
+  email: String!
+  password: String!
+  username: String!
 }
+
+type RegisterResponse {
+  user: User
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 """User model"""
-type UserModel {
+type User {
+  conversations: [Conversation!]
   createdAt: DateTime
   email: String!
   id: ID!
   password: String
-  profileImg: String
-  rooms: [RoomModel!]!
   updatedAt: DateTime
   username: String!
 }
