@@ -6,7 +6,13 @@ import { PrismaService } from 'src/prisma.service';
 import { TokenService } from './token.service';
 
 @Module({
-  providers: [AuthResolver, AuthService, JwtService, PrismaService, TokenService],
-  exports: [TokenService]
+  providers: [
+    AuthResolver,
+    AuthService,
+    JwtService,
+    PrismaService,
+    TokenService,
+  ],
+  exports: [TokenService],
 })
 export class AuthModule {}

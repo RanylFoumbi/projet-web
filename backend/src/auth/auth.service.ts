@@ -86,11 +86,12 @@ export class AuthService {
     }
     return null;
   }
-  
+
   async register(registerDto: RegisterDto, response: Response) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: registerDto.email },
     });
+    console.log({ existingUser });
     if (existingUser) {
       throw new BadRequestException('Email already in use');
     }

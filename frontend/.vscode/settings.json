@@ -1,0 +1,22 @@
+{
+    "vetur.validation.template": false,
+    "vetur.format.defaultFormatter.html": "none",
+    // Set the default
+    "editor.formatOnSave": false,
+    // Enable per-language
+    "[javascript]": {
+        "editor.formatOnSave": true
+    },
+    "[vue]": {
+        "editor.formatOnSave": true
+    },
+    "[php]": {
+        "editor.formatOnSave": true
+    },
+    "files.autoSave": "afterDelay",
+    "prettier.printWidth": 81,
+    "prettier.singleQuote": true,
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true
+      
+}

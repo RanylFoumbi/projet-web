@@ -15,9 +15,11 @@ export class AuthResolver {
     @Context() context: { res: Response },
   ) {
     if (registerDto.password !== registerDto.confirmPassword) {
-      throw new BadRequestException('Password and confirm password are not the same.');
+      throw new BadRequestException(
+        'Password and confirm password are not the same.',
+      );
     }
-    console.log(context.res)
+    console.log(context.res);
     const { user } = await this.authService.register(registerDto, context.res);
     return { user };
   }
