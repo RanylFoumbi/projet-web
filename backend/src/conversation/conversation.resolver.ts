@@ -57,7 +57,7 @@ export class ConversationResolver {
     return messages || [];
   }
 
-  @ResolveField('participants', () => [UserEntity])
+  @ResolveField('users', () => [UserEntity])
   async getParticipants(@Parent() conversation: Conversation) {
     const participants = this.prismService.user.findMany({
       where: {

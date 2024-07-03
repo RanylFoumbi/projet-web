@@ -26,7 +26,7 @@ export class MessageService {
       },
     });
 
-    if(convMessages) {
+    if (convMessages) {
       await this.redisService.set(convId, JSON.stringify(convMessages));
     }
 
