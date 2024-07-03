@@ -7,9 +7,8 @@ type Conversation {
   createdAt: String
   id: ID!
   messages: [Message!]!
-  participants: [User!]!
   updatedAt: String
-  users: User!
+  users: [User!]!
 }
 
 input CreateConversationDto {
@@ -34,10 +33,10 @@ type LoginResponse {
 """Message model"""
 type Message {
   content: String!
-  conversation: Conversation!
+  conversation: Conversation
   createdAt: DateTime!
   id: ID!
-  sender: User!
+  sender: User
   updatedAt: DateTime!
 }
 
