@@ -1,0 +1,535 @@
+<template>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-full sm:w-1/4 flex flex-col bg-white border-r border-gray-300">
+            <!-- Sidebar Header -->
+            <header class="p-4 border-b border-gray-300 flex justify-between items-center bg-indigo-600 text-white">
+                <h1 class="text-md font-semibold">Mes conversations</h1>
+                <button @click="openModal" class="bg-indigo-500 text-white px-4 py-2 rounded-md">
+                    <i class="mdi mdi-plus"></i>
+                </button>
+            </header>
+
+            <!-- Contact Conversations -->
+            <div class="flex-1 overflow-y-auto p-3">
+                <div
+                    v-for="(conversation, index) in conversationList"
+                    :key="index"
+                    class="flex items-center mb-4 cursor-pointer bg-gray-100 p-2 rounded-md"
+                    @click="selectConversation(index)"
+                >
+                    <div
+                        class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-200 rounded-full"
+                    >
+                        <span class="font-medium text-green-600">{{ index }}</span>
+                    </div>
+                    <div class="flex-1 pl-5">
+                        <h2 class="text-lg font-semibold">{{ conversation?.id }}</h2>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-sm text-gray-500">
+                            {{ formatDateToFR(new Date(conversation?.updatedAt)) }}
+                        </span>
+                        <span class="bg-indigo-500 text-white px-2 py-1 rounded-md text-xs">{{
+                            conversation.messages.length
+                        }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="bg-white border-t border-gray-300 flex justify-center p-4">
+                <button @click="logout" class="bg-indigo-500 text-white px-4 py-2 rounded-md w-full">
+                    Se déconnecter
+                </button>
+            </footer>
+        </div>
+
+        <!-- Modal -->
+        <div
+            v-if="isModalOpen"
+            @click.self="closeModal"
+            class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center"
+        >
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl max-w-md w-full">
+                <div class="px-6 py-4">
+                    <h2 class="text-xl font-semibold mb-4">Select Users</h2>
+                    <form @submit.prevent="createChatRoom" class="space-y-4">
+                        <!-- User Selection Checkboxes -->
+                        <div v-for="user in users" :key="user.id">
+                            <label class="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    v-model="selectedUsers"
+                                    :value="user.id"
+                                    class="form-checkbox text-blue-600"
+                                />
+                                <span class="ml-2">{{ user.name }}</span>
+                            </label>
+                        </div>
+                        <!-- Create Chat Room Button -->
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <div class="flex-1">
+                <Conversation v-if="selectedConversation != null" :conversation="selectedConversation" />
+                <Welcome v-else />
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue'
+import Welcome from './components/Welcome.vue'
+import Conversation from './components/Conversation.vue'
+import { Conversation as ConversationType } from './gql/graphql'
+import { formatDateToFR } from './utils/formatDate'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const conversationList = ref<ConversationType[]>([])
+const selectedConversation = ref<ConversationType | null>(null)
+
+const isModalOpen = ref(false)
+const users = ref([
+    { id: 'user1', name: 'User 1' },
+    { id: 'user2', name: 'User 2' },
+    { id: 'user3', name: 'User 3' },
+    // Add more users as needed
+])
+const selectedUsers = ref([])
+
+const openModal = () => {
+    isModalOpen.value = true
+}
+
+const closeModal = () => {
+    isModalOpen.value = false
+}
+
+const createChatRoom = () => {
+    console.log('Selected Users:', selectedUsers.value)
+    closeModal()
+}
+
+const selectConversation = (index: number) => {
+    selectedConversation.value = conversationList.value[index]
+}
+
+const logout = () => {
+    store.dispatch('auth/logout')
+}
+
+onMounted(async () => {
+    conversationList.value = [
+        {
+            id: '1',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            users: [
+                {
+                    id: '1',
+                    username: 'user1',
+                    email: '',
+                },
+                {
+                    id: '2',
+                    username: 'user2',
+                    email: '',
+                },
+            ],
+            messages: [
+                {
+                    id: '1',
+                    content: 'Hello',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@tes.com',
+                    },
+                },
+                {
+                    id: '2',
+                    content: 'Hi',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '3',
+                    content: 'How are you?',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '4',
+                    content: 'I am fine',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '2',
+                    content: 'Hi',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '3',
+                    content: 'How are you?',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '4',
+                    content: 'I am fine',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '2',
+                    content: 'Hi',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '3',
+                    content: 'How are you?',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '4',
+                    content: 'I am fine',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+            ],
+        },
+        {
+            id: '2',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            users: [
+                {
+                    id: '1',
+                    username: 'user1',
+                    email: '',
+                },
+                {
+                    id: '2',
+                    username: 'user2',
+                    email: '',
+                },
+            ],
+            messages: [
+                {
+                    id: '1',
+                    content: 'Hello',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@tes.com',
+                    },
+                },
+                {
+                    id: '2',
+                    content: 'Hi',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '3',
+                    content: 'How are you?',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '4',
+                    content: 'I am fine',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '2',
+                    content: 'Hi',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '3',
+                    content: 'How are you?',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '4',
+                    content: 'I am fine',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '2',
+                    content: 'Hi',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '3',
+                    content: 'How are you?',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '1',
+                        username: 'user1',
+                        email: 'test@ddd.com',
+                    },
+                },
+                {
+                    id: '4',
+                    content: 'I am fine',
+                    createdAt: '2021-10-10T10:10:10Z',
+                    updatedAt: '2021-10-10T10:10:10Z',
+                    conversation: {
+                        id: '1',
+                        users: [],
+                        createdAt: '2021-10-10T10:10:10Z',
+                        updatedAt: '2021-10-10T10:10:10Z',
+                        messages: [],
+                    },
+                    sender: {
+                        id: '2',
+                        username: 'user2',
+                        email: 'test@ddd.com',
+                    },
+                },
+            ],
+        },
+    ]
+})
+</script>
+
+<style scoped></style>
