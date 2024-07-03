@@ -41,7 +41,6 @@ const villusClient = useClient({
     use: [subscriptionsHandler, ...defaultPlugins()],
 })
 
-
 const app = createApp(App)
 
 app.use(villusClient).use(store).use(router).use(ToastPlugin).mount('#app')

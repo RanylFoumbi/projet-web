@@ -5,56 +5,54 @@ import { $toast } from '../../utils/toast'
 import { User, LoginDto, RegisterDto } from '../../gql/graphql'
 import gql from 'graphql-tag'
 
-
 const LOGIN_MUTATION = gql`
-mutation Login($loginInput: LoginDto!) {
-    login(loginInput: $loginInput) {
-        user {
-            createdAt
-            email
-            id
-            password
-            updatedAt
-            username
-            conversations {
+    mutation Login($loginInput: LoginDto!) {
+        login(loginInput: $loginInput) {
+            user {
                 createdAt
+                email
                 id
+                password
                 updatedAt
-                messages {
-                    content
+                username
+                conversations {
                     createdAt
                     id
                     updatedAt
-                }
-                participants {
-                    createdAt
-                    email
-                    id
-                    password
-                    updatedAt
-                    username
+                    messages {
+                        content
+                        createdAt
+                        id
+                        updatedAt
+                    }
+                    users {
+                        createdAt
+                        email
+                        id
+                        password
+                        updatedAt
+                        username
+                    }
                 }
             }
         }
     }
-}
-`;
+`
 
 const REGISTER_MUTATION = gql`
-mutation Register($registerInput: RegisterDto!) {
-    register(registerInput: $registerInput) {
-        user {
-            createdAt
-            email
-            id
-            password
-            updatedAt
-            username
+    mutation Register($registerInput: RegisterDto!) {
+        register(registerInput: $registerInput) {
+            user {
+                createdAt
+                email
+                id
+                password
+                updatedAt
+                username
+            }
         }
     }
-}
-`;
-
+`
 
 export type AuthState = {
     user: User | null
@@ -63,7 +61,6 @@ export type AuthState = {
 }
 
 type AuthActionContext = ActionContext<AuthState, AuthState>
-
 
 export const auth = {
     namespaced: true,
@@ -84,13 +81,12 @@ export const auth = {
         },
     },
     actions: {
-        
         async login({ commit }: AuthActionContext, { email, password }: LoginDto) {
             commit('setLoadingLogin', true)
 
             try {
                 const { data, execute, isDone, isFetching, error } = useMutation(LOGIN_MUTATION)
-                await execute({ loginInput: { email, password } });
+                await execute({ loginInput: { email, password } })
 
                 console.log('>>>>>>>>>>>> data:', data, 'isDone:', isDone, 'isFetching:', isFetching, 'error:', error)
 
@@ -108,7 +104,7 @@ export const auth = {
                 if (error && error?.value?.graphqlErrors[0]) {
                     commit('setLoadingLogin', false)
 
-                    const graphqlError = error?.value?.graphqlErrors[0] as any;
+                    const graphqlError = error?.value?.graphqlErrors[0] as any
 
                     if (graphqlError?.originalError?.extensions.originalError.statusCode === 400) {
                         console.log('Invalid credentials')
@@ -124,11 +120,14 @@ export const auth = {
                 $toast.error('Une erreur est survenue')
             }
         },
-        async register({ commit }: AuthActionContext, { username, email, password, confirmPassword = password }: RegisterDto) {
+        async register(
+            { commit }: AuthActionContext,
+            { username, email, password, confirmPassword = password }: RegisterDto,
+        ) {
             commit('setLoadingRegister', true)
             try {
                 const { data, execute, error, isDone, isFetching } = useMutation(REGISTER_MUTATION)
-                await execute({ registerInput: { username, email, password, confirmPassword } });
+                await execute({ registerInput: { username, email, password, confirmPassword } })
 
                 if (isFetching.value) {
                     commit('setLoadingRegister', true)
@@ -143,7 +142,7 @@ export const auth = {
                 if (error && error?.value?.graphqlErrors[0]) {
                     commit('setLoadingRegister', false)
 
-                    const graphqlError = error?.value?.graphqlErrors[0] as any;
+                    const graphqlError = error?.value?.graphqlErrors[0] as any
 
                     if (graphqlError?.originalError?.extensions.originalError.statusCode === 409) {
                         console.log('User already exists')

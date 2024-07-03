@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-
 export default {
     name: 'App',
     components: {},
@@ -11,9 +10,7 @@ export default {
         return {}
     },
     methods: {},
-    mounted() {
-    },
-
+    mounted() {},
 }
 </script>
 

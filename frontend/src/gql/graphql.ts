@@ -26,9 +26,8 @@ export type Conversation = {
     createdAt?: Maybe<Scalars['String']['output']>
     id: Scalars['ID']['output']
     messages: Array<Message>
-    participants: Array<User>
     updatedAt?: Maybe<Scalars['String']['output']>
-    users: User
+    users: Array<User>
 }
 
 export type CreateConversationDto = {
@@ -50,10 +49,10 @@ export type LoginResponse = {
 export type Message = {
     __typename?: 'Message'
     content: Scalars['String']['output']
-    conversation: Conversation
+    conversation?: Maybe<Conversation>
     createdAt: Scalars['DateTime']['output']
     id: Scalars['ID']['output']
-    sender: User
+    sender?: Maybe<User>
     updatedAt: Scalars['DateTime']['output']
 }
 
@@ -163,7 +162,7 @@ export type LoginMutation = {
                 id: string
                 updatedAt?: string | null
                 messages: Array<{ __typename?: 'Message'; content: string; createdAt: any; id: string; updatedAt: any }>
-                participants: Array<{
+                users: Array<{
                     __typename?: 'User'
                     createdAt?: any | null
                     email: string
@@ -278,7 +277,7 @@ export const LoginDocument = {
                                                         },
                                                         {
                                                             kind: 'Field',
-                                                            name: { kind: 'Name', value: 'participants' },
+                                                            name: { kind: 'Name', value: 'users' },
                                                             selectionSet: {
                                                                 kind: 'SelectionSet',
                                                                 selections: [
