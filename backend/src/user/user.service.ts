@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import * as fs from 'fs';
 import { join } from 'path';
-import { User } from './entity/user.entity';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -53,9 +53,18 @@ export class UserService {
     if (!user) {
       throw new BadRequestException('User no longer exists');
     }
-    return {
-      ...user,
-      conversations: [],
-    };
+    return user
+  }
+
+  async findUserByName(username: string): Promise<User[]> {
+    let users = await this.prisma.user.findMany({
+      where: {
+        username: {
+          contains: username,
+          mode: 'insensitive',
+        },
+      },
+    });
+    return users
   }
 }

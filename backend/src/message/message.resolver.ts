@@ -12,17 +12,22 @@ import { Message as MessageEntity } from './entities/message.entity';
 import { Message } from '@prisma/client';
 import { MessageInput } from './dto/message.dto';
 import { PrismaService } from 'src/prisma.service';
-import { User } from 'src/user/entity/user.entity';
+import { User as UserEntity } from 'src/user/entity/user.entity';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
 import { UseGuards } from '@nestjs/common';
 import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => MessageEntity)
 export class MessageResolver {
+  public pubSub: PubSub;
+
   constructor(
     private readonly messageService: MessageService,
     private readonly prismaService: PrismaService,
-  ) {}
+  ) {
+    this.pubSub = new PubSub();
+  }
 
   @UseGuards(GraphqlAuthGuard)
   @Query(() => [MessageEntity])
@@ -35,10 +40,14 @@ export class MessageResolver {
   @UseGuards(GraphqlAuthGuard)
   @Mutation(() => MessageEntity)
   async sendMessage(@Args('messageInput') messageInput: MessageInput) {
-    return this.messageService.sendMessage(messageInput);
+    const message = this.messageService.sendMessage(messageInput);
+    this.pubSub.publish(`newMessage.${messageInput.conversation}`, {
+      newMessage: message,
+    });
+    return message
   }
 
-  @ResolveField('sender', () => User)
+  @ResolveField('sender', () => UserEntity)
   async sender(@Parent() message: Message) {
     return this.prismaService.user.findUnique({
       where: {

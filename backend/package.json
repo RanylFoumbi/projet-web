@@ -17,7 +17,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:init": "npx prisma init",
+    "prisma:migrate": "npx prisma migrate dev --name init"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
@@ -30,6 +32,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.16.1",
+    "apollo-server-express": "^3.13.0",
     "bcrypt": "^5.1.1",
     "bull": "^4.13.0",
     "class-transformer": "^0.5.1",

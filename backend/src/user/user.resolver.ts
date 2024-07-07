@@ -1,6 +1,6 @@
-import { Args, Mutation, Resolver, Context } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Context, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { User } from './entity/user.entity';
+import { User as UserEntity } from './entity/user.entity';
 import { Request } from 'express';
 import { UseGuards } from '@nestjs/common';
 import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
@@ -8,13 +8,19 @@ import { createWriteStream } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import { Conversation as ConversationEntity } from 'src/conversation/entities/conversation.entity';
+import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
-@Resolver()
+@Resolver(() => UserEntity)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   @UseGuards(GraphqlAuthGuard)
-  @Mutation(() => User)
+  @Mutation(() => UserEntity)
   async updateProfile(
     @Args('username') username: string,
     @Args('file', { type: () => GraphQLUpload, nullable: true })
@@ -34,5 +40,24 @@ export class UserResolver {
     const readStream = createReadStream();
     readStream.pipe(createWriteStream(imagePath));
     return imageUrl;
+  }
+
+  @UseGuards(GraphqlAuthGuard)
+  @Query(() => [UserEntity])
+  async findUserByName(@Args('query') query: string, @Context() context: any){
+    context.findUser = true;
+    return this.userService.findUserByName(query);
+  }
+
+  @ResolveField('conversations', () => [ConversationEntity])
+  async getConversations(@Parent() user: User, @Context() context: { findUser: Boolean }){
+    if(context.findUser)
+      return []
+    return this.prismaService.conversation.findMany({
+      where: {
+        users: { some: { id: user.id } },
+        },
+      }
+    );
   }
 }
