@@ -59,6 +59,7 @@ type Mutation {
 }
 
 type Query {
+  findUserByName(query: String!): [User!]!
   getConversationMessages(convId: ID!): [Message!]!
   getUserConversations(userId: ID!): [Conversation!]!
   health: String!
@@ -76,12 +77,16 @@ type RegisterResponse {
   user: User
 }
 
+type Subscription {
+  newMessage(convId: String!): Message
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
 """User model"""
 type User {
-  conversations: [Conversation!]
+  conversations: [Conversation!]!
   createdAt: DateTime
   email: String!
   id: ID!

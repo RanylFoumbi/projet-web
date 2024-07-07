@@ -3,6 +3,7 @@ import {
   ID,
   Resolver,
   Query,
+  Subscription,
   Mutation,
   ResolveField,
   Parent,
@@ -14,15 +15,22 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Conversation } from '@prisma/client';
 import { User as UserEntity } from 'src/user/entity/user.entity';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UseFilters } from '@nestjs/common';
 import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { GraphQLErrorFilter } from 'src/utils/custom-exception.fileter';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => ConversationEntity)
 export class ConversationResolver {
+
+  public pubSub: PubSub;
+
   constructor(
     private readonly convService: ConversationService,
     private readonly prismService: PrismaService,
-  ) {}
+  ) {
+    this.pubSub = new PubSub();
+  }
 
   @UseGuards(GraphqlAuthGuard)
   @Query(() => [ConversationEntity])
@@ -32,6 +40,7 @@ export class ConversationResolver {
     return this.convService.getConversations(userId);
   }
 
+  @UseFilters(GraphQLErrorFilter)
   @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ConversationEntity)
   async createConversation(
@@ -39,6 +48,14 @@ export class ConversationResolver {
   ) {
     console.log('convInput', convInput);
     return this.convService.createConversation(convInput);
+  }
+
+  @Subscription(() => MessageEntity, {
+    nullable: true,
+    resolve: (value) => value.newMessage,
+  }) 
+  async newMessage(@Args('convId') convId: String) {
+    return this.pubSub.asyncIterator(`newMessage.${convId}`);
   }
 
   @UseGuards(GraphqlAuthGuard)
@@ -56,6 +73,7 @@ export class ConversationResolver {
     });
     return messages || [];
   }
+  
 
   @ResolveField('users', () => [UserEntity])
   async getParticipants(@Parent() conversation: Conversation) {

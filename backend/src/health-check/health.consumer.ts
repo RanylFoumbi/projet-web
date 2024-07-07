@@ -6,8 +6,8 @@ import {
   Processor,
 } from '@nestjs/bull';
 import { Job } from 'bull';
-import { JobData } from '../types/job';
-import { QueueName } from '../types/queue';
+import { JobData } from './job';
+import { QueueName } from './queue';
 
 @Processor(QueueName.HEALTH)
 export class HealthConsumer {

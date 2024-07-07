@@ -1,8 +1,8 @@
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Queue, Job } from 'bull';
-import { JobData } from '../types/job';
-import { QueueName } from '../types/queue';
+import { JobData } from './job';
+import { QueueName } from './queue';
 
 @Injectable()
 export class HealthService {
