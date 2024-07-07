@@ -45,35 +45,14 @@
         </div>
 
         <!-- Modal -->
-        <div
-            v-if="isModalOpen"
-            @click.self="closeModal"
-            class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center"
-        >
-            <div class="bg-white rounded-lg overflow-hidden shadow-xl max-w-md w-full">
-                <div class="px-6 py-4">
-                    <h2 class="text-xl font-semibold mb-4">Select Users</h2>
-                    <form @submit.prevent="createChatRoom" class="space-y-4">
-                        <!-- User Selection Checkboxes -->
-                        <div v-for="user in users" :key="user.id">
-                            <label class="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    v-model="selectedUsers"
-                                    :value="user.id"
-                                    class="form-checkbox text-blue-600"
-                                />
-                                <span class="ml-2">{{ user.name }}</span>
-                            </label>
-                        </div>
-                        <!-- Create Chat Room Button -->
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Create</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <NewConvDialog
+            :users="users"
+            @closeModal="closeModal"
+            :isModalOpen="isModalOpen"
+            :selectedUsers="selectedUsers"
+            @createChatRoom="createChatRoom"
+        />
+        
 
         <!-- Main Chat Area -->
         <div class="flex-1 flex flex-col">
@@ -89,6 +68,7 @@
 import { onMounted, ref } from 'vue'
 import Welcome from './components/Welcome.vue'
 import Conversation from './components/Conversation.vue'
+import NewConvDialog from './components/NewConvDialog.vue'
 import { Conversation as ConversationType } from './gql/graphql'
 import { formatDateToFR } from './utils/formatDate'
 import { useStore } from 'vuex'
