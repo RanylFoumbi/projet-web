@@ -17,7 +17,7 @@
                         <div
                             class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
                         >
-                            <h3 class="text-lg font-semibold text-gray-900">Créer une Conversation</h3>
+                            <h3 class="text-lg font-semibold text-gray-900">Créer une nouvelle conversation </h3>
                             <button
                                 type="button"
                                 @click="props.closeModal"
@@ -48,46 +48,31 @@
                                     <label
                                         for="name"
                                         class="block mb-2 text-sm font-medium text-gray-900 "
-                                        >Name</label
+                                        >Nom</label
                                     >
                                     <input
                                         type="text"
                                         name="name"
                                         id="name"
+                                        v-model="name"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                                         placeholder="Type product name"
                                     />
                                 </div>
-                                <div class="col-span-2 sm:col-span-1">
+                                <div class="col-span-2">
                                     <label
                                         for="price"
                                         class="block mb-2 text-sm font-medium text-gray-900"
-                                        >Price</label
+                                        >Participants</label
                                     >
-                                    <input
-                                        type="number"
-                                        name="price"
-                                        id="price"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                        placeholder="$2999"
-                                    />
-                                </div>
-                                <div class="col-span-2">
-                                    <label
-                                        for="description"
-                                        class="block mb-2 text-sm font-medium text-gray-900 "
-                                        >Product Description</label
-                                    >
-                                    <textarea
-                                        id="description"
-                                        rows="4"
-                                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
-                                        placeholder="Write product description here"
-                                    ></textarea>
+                                    <select multiple v-model="selectedUsers" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ">
+                                        <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
+                                    </select>
                                 </div>
                             </div>
                             <button
-                                type="submit"
+                                type="button"
+                                @click="props.createConversation"
                                 class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             >
                                 <svg
@@ -102,7 +87,7 @@
                                         clip-rule="evenodd"
                                     ></path>
                                 </svg>
-                                Créer
+                                Créer la conversation
                             </button>
                         </form>
                     </div>
@@ -112,12 +97,33 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, onMounted } from 'vue'
+import { User } from '../gql/graphql.ts'
 
 const props = defineProps<{
     isModalOpen: boolean
-    closeModal: Function
+    closeModal: Function,
+    createConversation: Function
 }>()
+
+const name = ref('')
+const users = ref<User[]>([])
+const selectedUsers = ref<String[]>([])
+
+const createConversation = () => {
+    console.log('>>>>>>>>>>>>> ',name.value, users.value, selectedUsers.value);
+    // props.createConversation(name.value, selectedUsers.value);
+    props.closeModal();
+}
+
+const getUsers = () => {
+    console.log('>>>>>>>>>>>>> ',users.value);
+}
+
+onMounted(() => {
+    console.log('>>>>>>>>>>>>> ',props);
+    getUsers();
+})
 
 </script>
 

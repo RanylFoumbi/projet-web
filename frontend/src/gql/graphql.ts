@@ -102,10 +102,15 @@ export type MutationUpdateProfileArgs = {
 
 export type Query = {
     __typename?: 'Query'
+    findUserByName: Array<User>
     getConversationMessages: Array<Message>
     getUserConversations: Array<Conversation>
     health: Scalars['String']['output']
     healthCheck: Scalars['String']['output']
+}
+
+export type QueryFindUserByNameArgs = {
+    query: Scalars['String']['input']
 }
 
 export type QueryGetConversationMessagesArgs = {
@@ -128,10 +133,19 @@ export type RegisterResponse = {
     user?: Maybe<User>
 }
 
+export type Subscription = {
+    __typename?: 'Subscription'
+    newMessage?: Maybe<Message>
+}
+
+export type SubscriptionNewMessageArgs = {
+    convId: Scalars['String']['input']
+}
+
 /** User model */
 export type User = {
     __typename?: 'User'
-    conversations?: Maybe<Array<Conversation>>
+    conversations: Array<Conversation>
     createdAt?: Maybe<Scalars['DateTime']['output']>
     email: Scalars['String']['output']
     id: Scalars['ID']['output']
@@ -156,7 +170,7 @@ export type LoginMutation = {
             password?: string | null
             updatedAt?: any | null
             username: string
-            conversations?: Array<{
+            conversations: Array<{
                 __typename?: 'Conversation'
                 createdAt?: string | null
                 id: string
@@ -171,7 +185,7 @@ export type LoginMutation = {
                     updatedAt?: any | null
                     username: string
                 }>
-            }> | null
+            }>
         }
     }
 }

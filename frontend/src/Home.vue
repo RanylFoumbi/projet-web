@@ -46,11 +46,9 @@
 
         <!-- Modal -->
         <NewConvDialog
-            :users="users"
-            @closeModal="closeModal"
+            :closeModal="closeModal"
             :isModalOpen="isModalOpen"
-            :selectedUsers="selectedUsers"
-            @createChatRoom="createChatRoom"
+            :createConversation="createConversation"
         />
         
 
@@ -79,13 +77,6 @@ const conversationList = ref<ConversationType[]>([])
 const selectedConversation = ref<ConversationType | null>(null)
 
 const isModalOpen = ref(false)
-const users = ref([
-    { id: 'user1', name: 'User 1' },
-    { id: 'user2', name: 'User 2' },
-    { id: 'user3', name: 'User 3' },
-    // Add more users as needed
-])
-const selectedUsers = ref([])
 
 const openModal = () => {
     isModalOpen.value = true
@@ -95,13 +86,8 @@ const closeModal = () => {
     isModalOpen.value = false
 }
 
-const createChatRoom = () => {
-    console.log('Selected Users:', selectedUsers.value)
+const createConversation = () => {
     closeModal()
-}
-
-const selectConversation = (index: number) => {
-    selectedConversation.value = conversationList.value[index]
 }
 
 const logout = () => {
@@ -119,11 +105,13 @@ onMounted(async () => {
                     id: '1',
                     username: 'user1',
                     email: '',
+                    conversations: [],
                 },
                 {
                     id: '2',
                     username: 'user2',
                     email: '',
+                    conversations: [],
                 },
             ],
             messages: [
@@ -143,6 +131,7 @@ onMounted(async () => {
                         id: '1',
                         username: 'user1',
                         email: 'test@tes.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -161,6 +150,7 @@ onMounted(async () => {
                         id: '2',
                         username: 'user2',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -179,6 +169,7 @@ onMounted(async () => {
                         id: '1',
                         username: 'user1',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -197,6 +188,7 @@ onMounted(async () => {
                         id: '2',
                         username: 'user2',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -215,6 +207,7 @@ onMounted(async () => {
                         id: '2',
                         username: 'user2',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -233,6 +226,7 @@ onMounted(async () => {
                         id: '1',
                         username: 'user1',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -251,6 +245,7 @@ onMounted(async () => {
                         id: '2',
                         username: 'user2',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -269,6 +264,7 @@ onMounted(async () => {
                         id: '2',
                         username: 'user2',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -287,6 +283,7 @@ onMounted(async () => {
                         id: '1',
                         username: 'user1',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
                 {
@@ -305,209 +302,11 @@ onMounted(async () => {
                         id: '2',
                         username: 'user2',
                         email: 'test@ddd.com',
+                        conversations: [],
                     },
                 },
             ],
-        },
-        {
-            id: '2',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            users: [
-                {
-                    id: '1',
-                    username: 'user1',
-                    email: '',
-                },
-                {
-                    id: '2',
-                    username: 'user2',
-                    email: '',
-                },
-            ],
-            messages: [
-                {
-                    id: '1',
-                    content: 'Hello',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '1',
-                        username: 'user1',
-                        email: 'test@tes.com',
-                    },
-                },
-                {
-                    id: '2',
-                    content: 'Hi',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '2',
-                        username: 'user2',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '3',
-                    content: 'How are you?',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '1',
-                        username: 'user1',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '4',
-                    content: 'I am fine',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '2',
-                        username: 'user2',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '2',
-                    content: 'Hi',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '2',
-                        username: 'user2',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '3',
-                    content: 'How are you?',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '1',
-                        username: 'user1',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '4',
-                    content: 'I am fine',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '2',
-                        username: 'user2',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '2',
-                    content: 'Hi',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '2',
-                        username: 'user2',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '3',
-                    content: 'How are you?',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '1',
-                        username: 'user1',
-                        email: 'test@ddd.com',
-                    },
-                },
-                {
-                    id: '4',
-                    content: 'I am fine',
-                    createdAt: '2021-10-10T10:10:10Z',
-                    updatedAt: '2021-10-10T10:10:10Z',
-                    conversation: {
-                        id: '1',
-                        users: [],
-                        createdAt: '2021-10-10T10:10:10Z',
-                        updatedAt: '2021-10-10T10:10:10Z',
-                        messages: [],
-                    },
-                    sender: {
-                        id: '2',
-                        username: 'user2',
-                        email: 'test@ddd.com',
-                    },
-                },
-            ],
-        },
+        }
     ]
 })
 </script>

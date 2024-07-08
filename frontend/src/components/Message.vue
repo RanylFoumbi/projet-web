@@ -51,7 +51,7 @@ const props = defineProps<{
     message: Message | null
 }>()
 
-const isMine = computed(() => props?.message?.sender.id === '1')
+const isMine = computed(() => props?.message?.sender?.id === '1')
 
 const formatName = (name: string) => {
     if (!name) return ''
