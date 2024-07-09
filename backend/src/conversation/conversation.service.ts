@@ -18,7 +18,6 @@ export class ConversationService {
       data: {
         name: convDto.name,
         users: { connect: convDto.users.map((userId) => ({ id: userId })) },
-        createdAt: new Date(),
       },
     });
 

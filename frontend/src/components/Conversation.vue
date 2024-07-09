@@ -26,7 +26,11 @@
             </div>
         </div>
         <div class="h-screen overflow-y-auto p-4 pb-36" ref="messagesContainer">
-            <Message v-for="(message, index) in props?.conversation?.messages" :key="index" :message="message" />
+            <Message
+                v-for="(message, index) in messages"
+                :key="index"
+                :message="message"
+            />
         </div>
 
         <!-- Chat Input -->
@@ -111,7 +115,6 @@ const scrollToBottom = () => {
 }
 
 const getConversationMessages = async (convId: String) => {
-    console.log('convId', convId)
     try {
         const { execute, error } = useQuery({
             query: GET_CONVERSATION_MESSAGES_QUERY,
@@ -119,9 +122,8 @@ const getConversationMessages = async (convId: String) => {
         })
 
         const { data } = await execute()
-
-        if (data && data?.value?.getConversationMessages) {
-            messages.value = data.value.getConversationMessages
+        if (data && data?.getConversationMessages) {
+            messages.value = data.getConversationMessages
         }
 
         if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
@@ -142,12 +144,12 @@ const sendMessage = async () => {
             messageInput: {
                 content: currentMessage.value,
                 sender: store.state.auth.user?.id,
-                conversationId: props?.conversation?.id,
+                conversation: props?.conversation?.id,
             },
         })
 
         if (data && data?.value?.sendMessage) {
-            messages.value = [...messages.value, data.value.sendMessage]
+            getConversationMessages(props?.conversation?.id)
             currentMessage.value = ''
             scrollToBottom()
         }

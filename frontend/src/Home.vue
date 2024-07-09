@@ -13,6 +13,7 @@
             <!-- Contact Conversations -->
             <div class="flex-1 overflow-y-auto p-3">
                 <div
+                    v-if="conversationList.length > 0"
                     v-for="(conversation, index) in conversationList"
                     :key="index"
                     class="flex items-center mb-4 cursor-pointer bg-gray-100 p-2 rounded-md"
@@ -34,6 +35,10 @@
                             conversation?.messages?.length || 0
                         }}</span>
                     </div>
+                </div>
+
+                <div v-else class="flex items-center justify-center h-full">
+                    <p class="text-gray-500">Aucune conversation</p>
                 </div>
             </div>
 

@@ -50,13 +50,14 @@ export class UserResolver {
     return imageUrl;
   }
 
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Query(() => [UserEntity])
   async findUserByName(@Context() context: any, @Args('query') query?: string) {
     context.findUser = true;
     const users = this.userService.findUserByName(query);
     return (await users).map((user: User) => ({
       id: user.id,
+      email: user.email,
       username: user.username,
       avatarUrl: user.avatarUrl,
     }));

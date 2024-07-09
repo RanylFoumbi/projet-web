@@ -18,6 +18,8 @@ import { User as UserEntity } from 'src/user/entity/user.entity';
 import { UseFilters } from '@nestjs/common';
 import { GraphQLErrorFilter } from 'src/utils/custom-exception.fileter';
 import { PubSub } from 'graphql-subscriptions';
+import { UseGuards } from '@nestjs/common';
+import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
 
 @Resolver(() => ConversationEntity)
 export class ConversationResolver {
@@ -30,7 +32,7 @@ export class ConversationResolver {
     this.pubSub = new PubSub();
   }
 
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Query(() => [ConversationEntity])
   async getUserConversations(
     @Args('userId', { type: () => ID }) userId: string,
@@ -39,7 +41,7 @@ export class ConversationResolver {
   }
 
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ConversationEntity)
   async createConversation(
     @Args('convInput') convInput: CreateConversationDto,
@@ -56,7 +58,7 @@ export class ConversationResolver {
     return this.pubSub.asyncIterator(`newMessage.${convId}`);
   }
 
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ConversationEntity)
   async deleteConversation(@Args('convId', { type: () => ID }) convId: string) {
     return this.convService.deleteConversation(convId);
