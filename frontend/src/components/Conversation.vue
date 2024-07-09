@@ -6,7 +6,7 @@
                     <img class="w-10 h-10 rounded-full" src="https://randomuser.me/api/portraits" />
                 </div>
                 <div class="ml-4">
-                    <p class="text-grey-darkest">Conversation {{ conversation.id }}</p>
+                    <p class="text-grey-darkest font-bold">Conversation {{ conversation?.name }}</p>
                     <p class="text-grey-darker text-xs mt-1">
                         {{ conversation?.users?.map((user) => user?.username).join(', ') }}
                     </p>
@@ -26,7 +26,11 @@
             </div>
         </div>
         <div class="h-screen overflow-y-auto p-4 pb-36" ref="messagesContainer">
-            <Message v-for="(message, index) in props?.conversation?.messages" :key="index" :message="message" />
+            <Message
+                v-for="(message, index) in messages"
+                :key="index"
+                :message="message"
+            />
         </div>
 
         <!-- Chat Input -->
@@ -46,14 +50,62 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, onMounted } from 'vue'
-import { Conversation } from '../gql/graphql'
+import { ref, onMounted, watch } from 'vue'
 import Message from './Message.vue'
+import { $toast } from '../utils/toast'
+import { gql } from 'graphql-tag'
+import { useMutation, useQuery } from 'villus'
+import { Conversation, Message as MessageType, MessageInput } from '../gql/graphql'
+import { useStore } from 'vuex'
+
+const GET_CONVERSATION_MESSAGES_QUERY = gql`
+    query GetConversationMessages($convId: ID!) {
+        getConversationMessages(convId: $convId) {
+            content
+            createdAt
+            id
+            updatedAt
+            conversation {
+                createdAt
+                id
+                name
+                updatedAt
+            }
+            sender {
+                createdAt
+                id
+                username
+                updatedAt
+            }
+        }
+    }
+`
+
+const SEND_MESSAGE_MUTATION = gql`
+    mutation SendMessage($messageInput: MessageInput!) {
+        sendMessage(messageInput: $messageInput) {
+            content
+            createdAt
+            id
+            updatedAt
+            conversation {
+                createdAt
+                id
+                name
+                updatedAt
+            }
+        }
+    }
+`
+
+const store = useStore()
 
 const props = defineProps<{
-    conversation: Conversation | null
+    conversation: Conversation
 }>()
 
+const currentMessage = ref('')
+const messages = ref<MessageType[]>([])
 const messagesContainer = ref<HTMLElement | null>(null)
 
 const scrollToBottom = () => {
@@ -62,16 +114,70 @@ const scrollToBottom = () => {
     }
 }
 
-const currentMessage = ref('')
+const getConversationMessages = async (convId: String) => {
+    try {
+        const { execute, error } = useQuery({
+            query: GET_CONVERSATION_MESSAGES_QUERY,
+            variables: { convId },
+        })
 
-const sendMessage = () => {
-    console.log('Sending message...')
-    scrollToBottom()
+        const { data } = await execute()
+        if (data && data?.getConversationMessages) {
+            messages.value = data.getConversationMessages
+        }
+
+        if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
+            const graphqlError = error.value.graphqlErrors[0] as any
+            $toast.error(graphqlError.message)
+        }
+    } catch (error) {
+        console.error('Error during conversation creation:', error)
+        $toast.error('Une erreur est survenue')
+    }
+}
+
+const sendMessage = async () => {
+    try {
+        const { data, execute, error } = useMutation(SEND_MESSAGE_MUTATION)
+
+        await execute({
+            messageInput: {
+                content: currentMessage.value,
+                sender: store.state.auth.user?.id,
+                conversation: props?.conversation?.id,
+            },
+        })
+
+        if (data && data?.value?.sendMessage) {
+            getConversationMessages(props?.conversation?.id)
+            currentMessage.value = ''
+            scrollToBottom()
+        }
+
+        if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
+            const graphqlError = error.value.graphqlErrors[0] as any
+            $toast.error(graphqlError.message)
+        }
+    } catch (error) {
+        console.error('Error during message sending:', error)
+        $toast.error('Une erreur est survenue')
+    }
 }
 
 onMounted(() => {
+    getConversationMessages(props?.conversation?.id)
     scrollToBottom()
 })
+
+watch(
+    () => props?.conversation?.id,
+    () => {
+        if (props?.conversation?.id) {
+            getConversationMessages(props?.conversation?.id)
+            scrollToBottom()
+        }
+    },
+)
 </script>
 
 <style scoped></style>

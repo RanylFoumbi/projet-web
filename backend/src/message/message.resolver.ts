@@ -14,9 +14,9 @@ import { MessageInput } from './dto/message.dto';
 import { PrismaService } from 'src/prisma.service';
 import { User as UserEntity } from 'src/user/entity/user.entity';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { PubSub } from 'graphql-subscriptions';
 import { UseGuards } from '@nestjs/common';
 import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
-import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => MessageEntity)
 export class MessageResolver {
@@ -44,7 +44,7 @@ export class MessageResolver {
     this.pubSub.publish(`newMessage.${messageInput.conversation}`, {
       newMessage: message,
     });
-    return message
+    return message;
   }
 
   @ResolveField('sender', () => UserEntity)

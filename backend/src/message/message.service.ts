@@ -14,9 +14,11 @@ export class MessageService {
   ) {}
 
   async getConversationMessages(convId: string): Promise<Message[]> {
-    const cachedMessages = await this.redisService.get(convId);
-    if (cachedMessages) {
-      return JSON.parse(cachedMessages);
+    const cachedMessages = JSON.parse(await this.redisService.get(convId));
+
+    if (cachedMessages && typeof cachedMessages !== 'object') {
+      console.log('Returning cached messages', cachedMessages);
+      return cachedMessages;
     }
     const convMessages = this.prismaService.message.findMany({
       where: {
@@ -40,10 +42,19 @@ export class MessageService {
       },
     });
 
-    const cachedMessages = await this.redisService.get(messageInput.conversation);
-    const messages = JSON.parse(cachedMessages) || [];
-    messages.push(newMessage);
-    await this.redisService.set(messageInput.conversation, JSON.stringify(messages));
+    const cachedMessages = await this.redisService.get(
+      messageInput.conversation,
+    );
+    let messages = JSON.parse(cachedMessages);
+    if (typeof messages === 'object') {
+      messages = [newMessage];
+    } else {
+      messages.push(newMessage);
+    }
+    await this.redisService.set(
+      messageInput.conversation,
+      JSON.stringify(messages),
+    );
 
     const queue = await this.queueManagerService.getQueue(
       messageInput.conversation,

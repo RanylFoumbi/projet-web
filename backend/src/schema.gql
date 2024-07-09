@@ -7,6 +7,7 @@ type Conversation {
   createdAt: String
   id: ID!
   messages: [Message!]!
+  name: String!
   updatedAt: String
   users: [User!]!
 }

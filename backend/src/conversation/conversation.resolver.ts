@@ -15,14 +15,14 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Conversation } from '@prisma/client';
 import { User as UserEntity } from 'src/user/entity/user.entity';
-import { UseGuards, UseFilters } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { UseFilters } from '@nestjs/common';
 import { GraphQLErrorFilter } from 'src/utils/custom-exception.fileter';
 import { PubSub } from 'graphql-subscriptions';
+import { UseGuards } from '@nestjs/common';
+import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
 
 @Resolver(() => ConversationEntity)
 export class ConversationResolver {
-
   public pubSub: PubSub;
 
   constructor(
@@ -53,8 +53,8 @@ export class ConversationResolver {
   @Subscription(() => MessageEntity, {
     nullable: true,
     resolve: (value) => value.newMessage,
-  }) 
-  async newMessage(@Args('convId') convId: String) {
+  })
+  async newMessage(@Args('convId') convId: string) {
     return this.pubSub.asyncIterator(`newMessage.${convId}`);
   }
 
@@ -73,7 +73,6 @@ export class ConversationResolver {
     });
     return messages || [];
   }
-  
 
   @ResolveField('users', () => [UserEntity])
   async getParticipants(@Parent() conversation: Conversation) {

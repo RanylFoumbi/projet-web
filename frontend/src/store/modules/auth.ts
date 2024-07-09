@@ -88,8 +88,6 @@ export const auth = {
                 const { data, execute, isDone, isFetching, error } = useMutation(LOGIN_MUTATION)
                 await execute({ loginInput: { email, password } })
 
-                console.log('>>>>>>>>>>>> data:', data, 'isDone:', isDone, 'isFetching:', isFetching, 'error:', error)
-
                 if (isFetching.value) {
                     commit('setLoadingLogin', true)
                 }
@@ -101,7 +99,7 @@ export const auth = {
                     $toast.success('Vous êtes désormais connecté!')
                 }
 
-                if (error && error?.value?.graphqlErrors[0]) {
+                if (error && error?.value?.graphqlErrors !== undefined && error?.value?.graphqlErrors[0]) {
                     commit('setLoadingLogin', false)
 
                     const graphqlError = error?.value?.graphqlErrors[0] as any
@@ -139,7 +137,7 @@ export const auth = {
                     $toast.success('Vous êtes désormais inscrit!')
                 }
 
-                if (error && error?.value?.graphqlErrors[0]) {
+                if (error && error?.value?.graphqlErrors !== undefined && error?.value?.graphqlErrors[0]) {
                     commit('setLoadingRegister', false)
 
                     const graphqlError = error?.value?.graphqlErrors[0] as any

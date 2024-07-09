@@ -26,6 +26,7 @@ export type Conversation = {
     createdAt?: Maybe<Scalars['String']['output']>
     id: Scalars['ID']['output']
     messages: Array<Message>
+    name: Scalars['String']['output']
     updatedAt?: Maybe<Scalars['String']['output']>
     users: Array<User>
 }
@@ -102,10 +103,15 @@ export type MutationUpdateProfileArgs = {
 
 export type Query = {
     __typename?: 'Query'
+    findUserByName: Array<User>
     getConversationMessages: Array<Message>
     getUserConversations: Array<Conversation>
     health: Scalars['String']['output']
     healthCheck: Scalars['String']['output']
+}
+
+export type QueryFindUserByNameArgs = {
+    query: Scalars['String']['input']
 }
 
 export type QueryGetConversationMessagesArgs = {
@@ -128,16 +134,76 @@ export type RegisterResponse = {
     user?: Maybe<User>
 }
 
+export type Subscription = {
+    __typename?: 'Subscription'
+    newMessage?: Maybe<Message>
+}
+
+export type SubscriptionNewMessageArgs = {
+    convId: Scalars['String']['input']
+}
+
 /** User model */
 export type User = {
     __typename?: 'User'
-    conversations?: Maybe<Array<Conversation>>
+    conversations: Array<Conversation>
     createdAt?: Maybe<Scalars['DateTime']['output']>
     email: Scalars['String']['output']
     id: Scalars['ID']['output']
     password?: Maybe<Scalars['String']['output']>
     updatedAt?: Maybe<Scalars['DateTime']['output']>
     username: Scalars['String']['output']
+}
+
+export type GetConversationMessagesQueryVariables = Exact<{
+    convId: Scalars['ID']['input']
+}>
+
+export type GetConversationMessagesQuery = {
+    __typename?: 'Query'
+    getConversationMessages: Array<{
+        __typename?: 'Message'
+        content: string
+        createdAt: any
+        id: string
+        updatedAt: any
+        conversation?: {
+            __typename?: 'Conversation'
+            createdAt?: string | null
+            id: string
+            name: string
+            updatedAt?: string | null
+        } | null
+        sender?: {
+            __typename?: 'User'
+            createdAt?: any | null
+            id: string
+            username: string
+            updatedAt?: any | null
+        } | null
+    }>
+}
+
+export type SendMessageMutationVariables = Exact<{
+    messageInput: MessageInput
+}>
+
+export type SendMessageMutation = {
+    __typename?: 'Mutation'
+    sendMessage: {
+        __typename?: 'Message'
+        content: string
+        createdAt: any
+        id: string
+        updatedAt: any
+        conversation?: {
+            __typename?: 'Conversation'
+            createdAt?: string | null
+            id: string
+            name: string
+            updatedAt?: string | null
+        } | null
+    }
 }
 
 export type LoginMutationVariables = Exact<{
@@ -156,7 +222,7 @@ export type LoginMutation = {
             password?: string | null
             updatedAt?: any | null
             username: string
-            conversations?: Array<{
+            conversations: Array<{
                 __typename?: 'Conversation'
                 createdAt?: string | null
                 id: string
@@ -171,7 +237,7 @@ export type LoginMutation = {
                     updatedAt?: any | null
                     username: string
                 }>
-            }> | null
+            }>
         }
     }
 }
@@ -196,6 +262,189 @@ export type RegisterMutation = {
     }
 }
 
+export type CreateConversationMutationVariables = Exact<{
+    convInput: CreateConversationDto
+}>
+
+export type CreateConversationMutation = {
+    __typename?: 'Mutation'
+    createConversation: {
+        __typename?: 'Conversation'
+        createdAt?: string | null
+        id: string
+        updatedAt?: string | null
+        messages: Array<{ __typename?: 'Message'; content: string; createdAt: any; id: string; updatedAt: any }>
+        users: Array<{
+            __typename?: 'User'
+            createdAt?: any | null
+            email: string
+            id: string
+            password?: string | null
+            updatedAt?: any | null
+            username: string
+        }>
+    }
+}
+
+export type GetUserConversationsQueryVariables = Exact<{
+    userId: Scalars['ID']['input']
+}>
+
+export type GetUserConversationsQuery = {
+    __typename?: 'Query'
+    getUserConversations: Array<{
+        __typename?: 'Conversation'
+        id: string
+        name: string
+        createdAt?: string | null
+        updatedAt?: string | null
+        users: Array<{ __typename?: 'User'; id: string; username: string }>
+    }>
+}
+
+export type FindUserByNameQueryVariables = Exact<{
+    query: Scalars['String']['input']
+}>
+
+export type FindUserByNameQuery = {
+    __typename?: 'Query'
+    findUserByName: Array<{
+        __typename?: 'User'
+        createdAt?: any | null
+        email: string
+        id: string
+        password?: string | null
+        updatedAt?: any | null
+        username: string
+    }>
+}
+
+export const GetConversationMessagesDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'GetConversationMessages' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'convId' } },
+                    type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } } },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'getConversationMessages' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'convId' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'convId' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'conversation' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                        ],
+                                    },
+                                },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'sender' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<GetConversationMessagesQuery, GetConversationMessagesQueryVariables>
+export const SendMessageDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'SendMessage' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'messageInput' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'MessageInput' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'sendMessage' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'messageInput' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'messageInput' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'conversation' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<SendMessageMutation, SendMessageMutationVariables>
 export const LoginDocument = {
     kind: 'Document',
     definitions: [
@@ -378,3 +627,172 @@ export const RegisterDocument = {
         },
     ],
 } as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>
+export const CreateConversationDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'CreateConversation' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'convInput' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'CreateConversationDto' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createConversation' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'convInput' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'convInput' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'messages' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                        ],
+                                    },
+                                },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'users' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'password' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<CreateConversationMutation, CreateConversationMutationVariables>
+export const GetUserConversationsDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'GetUserConversations' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'userId' } },
+                    type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } } },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'getUserConversations' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'userId' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'userId' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'users' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                                        ],
+                                    },
+                                },
+                                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<GetUserConversationsQuery, GetUserConversationsQueryVariables>
+export const FindUserByNameDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'query',
+            name: { kind: 'Name', value: 'FindUserByName' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'query' } },
+                    type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } } },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'findUserByName' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'query' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'query' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'password' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<FindUserByNameQuery, FindUserByNameQueryVariables>
