@@ -206,6 +206,10 @@ export type SendMessageMutation = {
     }
 }
 
+export type RefreshTokenMutationVariables = Exact<{ [key: string]: never }>
+
+export type RefreshTokenMutation = { __typename?: 'Mutation'; refreshToken: string }
+
 export type LoginMutationVariables = Exact<{
     loginInput: LoginDto
 }>
@@ -445,6 +449,20 @@ export const SendMessageDocument = {
         },
     ],
 } as unknown as DocumentNode<SendMessageMutation, SendMessageMutationVariables>
+export const RefreshTokenDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'RefreshToken' },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [{ kind: 'Field', name: { kind: 'Name', value: 'refreshToken' } }],
+            },
+        },
+    ],
+} as unknown as DocumentNode<RefreshTokenMutation, RefreshTokenMutationVariables>
 export const LoginDocument = {
     kind: 'Document',
     definitions: [

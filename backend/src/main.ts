@@ -7,7 +7,8 @@ import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: '*',
+    origin: 'http://localhost:5173',
+    credentials: true,
     allowedHeaders: [
       'Accept',
       'Authorization',
@@ -24,11 +25,13 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       exceptionFactory: (errors) => {
-        const formattedErrors = errors.map(error => {
-          const constraints = Object.values(error.constraints).join(', ');
-          return `${error.property}: ${constraints}`;
-        }).join('; ');
-        
+        const formattedErrors = errors
+          .map((error) => {
+            const constraints = Object.values(error.constraints).join(', ');
+            return `${error.property}: ${constraints}`;
+          })
+          .join('; ');
+
         throw new BadRequestException(`Validation failed: ${formattedErrors}`);
       },
     }),

@@ -1,10 +1,10 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
-import { ArrayNotEmpty, IsNotEmpty } from 'class-validator';
+import { ArrayMaxSize, IsNotEmpty } from 'class-validator';
 
 @InputType()
 export class CreateConversationDto {
   @Field(() => [ID])
-  @ArrayNotEmpty({
+  @ArrayMaxSize(2,{
     message: 'Conversation must contains at less 2 participants',
   })
   users: string[];

@@ -6,7 +6,12 @@ import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [],
-  providers: [ConversationService, ConversationResolver, PrismaService, JwtService],
+  providers: [
+    ConversationService,
+    ConversationResolver,
+    PrismaService,
+    JwtService,
+  ],
   exports: [ConversationService],
 })
 export class ConversationModule {}
