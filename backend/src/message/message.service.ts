@@ -40,10 +40,15 @@ export class MessageService {
       },
     });
 
-    const cachedMessages = await this.redisService.get(messageInput.conversation);
+    const cachedMessages = await this.redisService.get(
+      messageInput.conversation,
+    );
     const messages = JSON.parse(cachedMessages) || [];
     messages.push(newMessage);
-    await this.redisService.set(messageInput.conversation, JSON.stringify(messages));
+    await this.redisService.set(
+      messageInput.conversation,
+      JSON.stringify(messages),
+    );
 
     const queue = await this.queueManagerService.getQueue(
       messageInput.conversation,

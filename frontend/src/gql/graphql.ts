@@ -26,6 +26,7 @@ export type Conversation = {
     createdAt?: Maybe<Scalars['String']['output']>
     id: Scalars['ID']['output']
     messages: Array<Message>
+    name: Scalars['String']['output']
     updatedAt?: Maybe<Scalars['String']['output']>
     users: Array<User>
 }

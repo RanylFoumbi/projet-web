@@ -14,8 +14,6 @@ import { MessageInput } from './dto/message.dto';
 import { PrismaService } from 'src/prisma.service';
 import { User as UserEntity } from 'src/user/entity/user.entity';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
-import { UseGuards } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
 import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => MessageEntity)
@@ -29,7 +27,7 @@ export class MessageResolver {
     this.pubSub = new PubSub();
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [MessageEntity])
   async getConversationMessages(
     @Args('convId', { type: () => ID }) convId: string,
@@ -37,14 +35,14 @@ export class MessageResolver {
     return this.messageService.getConversationMessages(convId);
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => MessageEntity)
   async sendMessage(@Args('messageInput') messageInput: MessageInput) {
     const message = this.messageService.sendMessage(messageInput);
     this.pubSub.publish(`newMessage.${messageInput.conversation}`, {
       newMessage: message,
     });
-    return message
+    return message;
   }
 
   @ResolveField('sender', () => UserEntity)

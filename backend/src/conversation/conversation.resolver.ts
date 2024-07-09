@@ -15,14 +15,12 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Conversation } from '@prisma/client';
 import { User as UserEntity } from 'src/user/entity/user.entity';
-import { UseGuards, UseFilters } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { UseFilters } from '@nestjs/common';
 import { GraphQLErrorFilter } from 'src/utils/custom-exception.fileter';
 import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => ConversationEntity)
 export class ConversationResolver {
-
   public pubSub: PubSub;
 
   constructor(
@@ -32,7 +30,7 @@ export class ConversationResolver {
     this.pubSub = new PubSub();
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [ConversationEntity])
   async getUserConversations(
     @Args('userId', { type: () => ID }) userId: string,
@@ -41,7 +39,7 @@ export class ConversationResolver {
   }
 
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ConversationEntity)
   async createConversation(
     @Args('convInput') convInput: CreateConversationDto,
@@ -53,12 +51,12 @@ export class ConversationResolver {
   @Subscription(() => MessageEntity, {
     nullable: true,
     resolve: (value) => value.newMessage,
-  }) 
-  async newMessage(@Args('convId') convId: String) {
+  })
+  async newMessage(@Args('convId') convId: string) {
     return this.pubSub.asyncIterator(`newMessage.${convId}`);
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ConversationEntity)
   async deleteConversation(@Args('convId', { type: () => ID }) convId: string) {
     return this.convService.deleteConversation(convId);
@@ -73,7 +71,6 @@ export class ConversationResolver {
     });
     return messages || [];
   }
-  
 
   @ResolveField('users', () => [UserEntity])
   async getParticipants(@Parent() conversation: Conversation) {

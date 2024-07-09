@@ -1,4 +1,12 @@
-import { Args, Mutation, Resolver, Context, Query, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Resolver,
+  Context,
+  Query,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User as UserEntity } from './entity/user.entity';
 import { Request } from 'express';
@@ -42,28 +50,28 @@ export class UserResolver {
     return imageUrl;
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [UserEntity])
-  async findUserByName(@Context() context: any, @Args('query') query?: string){
+  async findUserByName(@Context() context: any, @Args('query') query?: string) {
     context.findUser = true;
-    const users = this.userService.findUserByName(query)
-    return (await users).map((user: User) => ({ 
+    const users = this.userService.findUserByName(query);
+    return (await users).map((user: User) => ({
       id: user.id,
       username: user.username,
       avatarUrl: user.avatarUrl,
-     })
-    );
+    }));
   }
 
   @ResolveField('conversations', () => [ConversationEntity])
-  async getConversations(@Parent() user: User, @Context() context: { findUser: Boolean }){
-    if(context.findUser)
-      return []
+  async getConversations(
+    @Parent() user: User,
+    @Context() context: { findUser: boolean },
+  ) {
+    if (context.findUser) return [];
     return this.prismaService.conversation.findMany({
       where: {
         users: { some: { id: user.id } },
-        },
-      }
-    );
+      },
+    });
   }
 }
