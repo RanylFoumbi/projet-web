@@ -53,7 +53,7 @@ export class UserService {
     if (!user) {
       throw new BadRequestException('User no longer exists');
     }
-    return user
+    return user;
   }
 
   async findUserByName(username: string): Promise<User[]> {
@@ -66,8 +66,8 @@ export class UserService {
           contains: username,
           mode: 'insensitive',
         },
-      }, 
+      },
     });
-    return users
+    return users;
   }
 }

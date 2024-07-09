@@ -26,11 +26,7 @@
             </div>
         </div>
         <div class="h-screen overflow-y-auto p-4 pb-36" ref="messagesContainer">
-            <Message
-                v-for="(message, index) in messages"
-                :key="index"
-                :message="message"
-            />
+            <Message v-for="(message, index) in messages" :key="index" :message="message" />
         </div>
 
         <!-- Chat Input -->

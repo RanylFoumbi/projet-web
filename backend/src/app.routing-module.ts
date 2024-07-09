@@ -12,6 +12,6 @@ import { AuthModule } from './auth/auth.module';
     UserModule,
     ConversationModule,
     MessageModule,
-  ]
+  ],
 })
 export class AppRoutingModule {}

@@ -53,6 +53,11 @@ const REGISTER_MUTATION = gql`
         }
     }
 `
+const LOGOUT_MUTATION = gql`
+    mutation Logout {
+        logout
+    }
+`
 
 export type AuthState = {
     user: User | null
@@ -159,6 +164,8 @@ export const auth = {
         logout({ commit }: AuthActionContext) {
             commit('setUser', null)
             localStorage.clear()
+            const { execute } = useMutation(LOGOUT_MUTATION)
+            execute()
             router.replace('/login')
         },
     },
