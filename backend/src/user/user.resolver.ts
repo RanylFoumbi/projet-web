@@ -44,9 +44,15 @@ export class UserResolver {
 
   @UseGuards(GraphqlAuthGuard)
   @Query(() => [UserEntity])
-  async findUserByName(@Args('query') query: string, @Context() context: any){
+  async findUserByName(@Context() context: any, @Args('query') query?: string){
     context.findUser = true;
-    return this.userService.findUserByName(query);
+    const users = this.userService.findUserByName(query)
+    return (await users).map((user: User) => ({ 
+      id: user.id,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+     })
+    );
   }
 
   @ResolveField('conversations', () => [ConversationEntity])

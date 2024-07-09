@@ -13,8 +13,6 @@ export class MessageService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  private messages: Message[] = [];
-
   async getConversationMessages(convId: string): Promise<Message[]> {
     const cachedMessages = await this.redisService.get(convId);
     if (cachedMessages) {
@@ -42,12 +40,16 @@ export class MessageService {
       },
     });
 
+    const cachedMessages = await this.redisService.get(messageInput.conversation);
+    const messages = JSON.parse(cachedMessages) || [];
+    messages.push(newMessage);
+    await this.redisService.set(messageInput.conversation, JSON.stringify(messages));
+
     const queue = await this.queueManagerService.getQueue(
       messageInput.conversation,
     );
 
     await queue.add('sendMessage', newMessage);
-    this.messages.push(newMessage);
     return newMessage;
   }
 }
