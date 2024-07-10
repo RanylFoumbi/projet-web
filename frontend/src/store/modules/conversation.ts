@@ -78,6 +78,18 @@ const DELETE_CONVERSATION_MUTATION = gql`
     }
 `
 
+const LEAVE_CONVERSATION_MUTATION = gql`
+    mutation LeaveConversation($convId: ID!, $userId: ID!) {
+        leaveConversation(convId: $convId, userId: $userId) {
+            createdAt
+            creatorId
+            id
+            name
+            updatedAt
+        }
+    }
+`
+
 export type ConversationState = {
     loading: boolean
     users: User[] | []
@@ -86,7 +98,7 @@ export type ConversationState = {
 
 type ConvActionContext = ActionContext<ConversationState, ConversationState>
 
-export default {
+export const conversation = {
     namespaced: true,
     state: {
         loading: false,
@@ -195,7 +207,39 @@ export default {
             }
         },
 
-        async deleteConversation({ commit, state }: ConvActionContext, dataToDelete: { convId: string; userId: string }) {
+        async leaveConversation({ commit, state }: ConvActionContext, dataToLeave: { convId: string; userId: string }) {
+            commit('setLoading', true)
+            try {
+                const { execute, data, isDone, error } = useMutation(LEAVE_CONVERSATION_MUTATION)
+                await execute(dataToLeave)
+
+                if (isDone.value && data?.value?.leaveConversation) {
+                    commit('setLoading', false)
+                    commit(
+                        'setConversations',
+                        state.conversations.filter((conv: Conversation) => conv.id !== dataToLeave.convId),
+                    )
+                    $toast.success('Conversation quittée!', { duration: 5000 })
+                }
+
+                if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
+                    commit('setLoading', false)
+
+                    const graphqlError = error.value.graphqlErrors[0] as any
+
+                    $toast.error(graphqlError.message)
+                }
+            } catch (error) {
+                console.error('Error during conversation deletion:', error)
+                commit('setLoading', false)
+                $toast.error('Une erreur est survenue')
+            }
+        },
+
+        async deleteConversation(
+            { commit, state }: ConvActionContext,
+            dataToDelete: { convId: string; userId: string },
+        ) {
             commit('setLoading', true)
             try {
                 const { execute, data, isDone, error } = useMutation(DELETE_CONVERSATION_MUTATION)

@@ -68,8 +68,11 @@ const toggleDropdown = () => {
 
 const leaveConversation = async () => {
     console.log('Leave conversation')
-    // await store.dispatch('conversations/leaveConversation', props.conversation.id, store.state.auth.user.id)
-    // toggleDropdown()
+    await store.dispatch('conversation/leaveConversation', {
+        convId: props.conversation.id,
+        userId: store.state.auth.user.id,
+    })
+    toggleDropdown()
 }
 
 const deleteConversation = async () => {

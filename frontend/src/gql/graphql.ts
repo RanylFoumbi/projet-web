@@ -70,6 +70,7 @@ export type Mutation = {
     __typename?: 'Mutation'
     createConversation: Conversation
     deleteConversation: Conversation
+    leaveConversation: Conversation
     login: LoginResponse
     logout: Scalars['String']['output']
     refreshToken: Scalars['String']['output']
@@ -83,6 +84,11 @@ export type MutationCreateConversationArgs = {
 }
 
 export type MutationDeleteConversationArgs = {
+    convId: Scalars['ID']['input']
+    userId: Scalars['ID']['input']
+}
+
+export type MutationLeaveConversationArgs = {
     convId: Scalars['ID']['input']
     userId: Scalars['ID']['input']
 }
@@ -290,6 +296,7 @@ export type CreateConversationMutation = {
         __typename?: 'Conversation'
         createdAt?: any | null
         id: string
+        name: string
         updatedAt?: any | null
         creatorId: string
         messages: Array<{ __typename?: 'Message'; content: string; createdAt: any; id: string; updatedAt: any }>
@@ -741,6 +748,7 @@ export const CreateConversationDocument = {
                             selections: [
                                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                                 { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
                                 { kind: 'Field', name: { kind: 'Name', value: 'creatorId' } },
                                 {

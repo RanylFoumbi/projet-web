@@ -39,6 +39,21 @@ export class ConversationService {
     return conversations || [];
   }
 
+  async leaveConversation(
+    convId: string,
+    userId: string,
+  ): Promise<Conversation> {
+    const conversation = await this.prismaService.conversation.update({
+      where: {
+        id: convId,
+      },
+      data: {
+        users: { disconnect: { id: userId } },
+      },
+    });
+    return conversation;
+  }
+
   async deleteConversation(
     convId: string,
     userId: string,

@@ -27,7 +27,7 @@ export class ConversationResolver {
 
   constructor(
     private readonly convService: ConversationService,
-    private readonly prismService: PrismaService,
+    private readonly prismaService: PrismaService,
   ) {
     this.pubSub = new PubSub();
   }
@@ -69,7 +69,7 @@ export class ConversationResolver {
 
   @ResolveField('messages', () => [MessageEntity])
   async getMessages(@Parent() conversation: Conversation) {
-    const messages = this.prismService.message.findMany({
+    const messages = this.prismaService.message.findMany({
       where: {
         conversationId: conversation.id,
       },
@@ -77,9 +77,18 @@ export class ConversationResolver {
     return messages || [];
   }
 
+  @UseGuards(GraphqlAuthGuard)
+  @Mutation(() => ConversationEntity)
+  async leaveConversation(
+    @Args('convId', { type: () => ID }) convId: string,
+    @Args('userId', { type: () => ID }) userId: string,
+  ) {
+    return this.convService.leaveConversation(convId, userId);
+  }
+
   @ResolveField('users', () => [UserEntity])
   async getParticipants(@Parent() conversation: Conversation) {
-    const participants = this.prismService.user.findMany({
+    const participants = this.prismaService.user.findMany({
       where: {
         conversations: {
           some: {
