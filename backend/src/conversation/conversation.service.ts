@@ -21,12 +21,7 @@ export class ConversationService {
         users: { connect: convDto.users.map((userId) => ({ id: userId })) },
       },
     });
-
     this.queueManagerService.createQueue(conversation.id);
-    console.log(
-      'Conversation created',
-      this.queueManagerService.getQueue(conversation.id),
-    );
     return conversation;
   }
 

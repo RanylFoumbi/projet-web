@@ -1,9 +1,42 @@
 import { ActionContext } from 'vuex'
 import { Conversation, CreateConversationDto, User } from '../../gql/graphql'
 import { gql } from 'graphql-tag'
-import { useMutation, useQuery } from 'villus'
+import { useMutation, useQuery, useSubscription } from 'villus'
 import { $toast } from '../../utils/toast'
 import store from '..'
+
+export const GET_CONVERSATION_MESSAGES_QUERY = gql`
+    query GetConversationMessages($convId: ID!) {
+        getConversationMessages(convId: $convId) {
+            content
+            createdAt
+            id
+            updatedAt
+            conversation {
+                createdAt
+                id
+                name
+                updatedAt
+            }
+            sender {
+                createdAt
+                id
+                username
+                updatedAt
+            }
+        }
+    }
+`
+export const NEW_MESSAGE_SUBSCRIPTION = gql`
+    subscription NewMessage($convId: ID!) {
+        newMessage(convId: $convId) {
+            content
+            createdAt
+            id
+            updatedAt
+        }
+    }
+`
 
 const CREATE_CONVERSATION_MUTATION = gql`
     mutation CreateConversation($convInput: CreateConversationDto!) {
@@ -42,10 +75,14 @@ const GET_CONVERSATIONS_QUERY = gql`
                 username
             }
             messages {
-                id
                 content
                 createdAt
+                id
                 updatedAt
+                sender {
+                    id
+                    username
+                }
             }
             createdAt
             updatedAt
@@ -133,8 +170,7 @@ export default {
                 $toast.error('Une erreur est survenue')
             }
         },
-
-        async getConversations({ commit }: ConvActionContext, userId: String) {
+        async getConversations({ commit, state }: ConvActionContext, userId: String) {
             commit('setLoading', true)
             try {
                 const { execute, error } = useQuery({
@@ -147,8 +183,26 @@ export default {
                 if (data && data?.getUserConversations) {
                     commit('setLoading', false)
                     commit('setConversations', data?.getUserConversations)
+                    for (const conversation of data?.getUserConversations) {
+                        useSubscription({
+                            query: NEW_MESSAGE_SUBSCRIPTION,
+                            variables: { convId: conversation.id },
+                        }, async ({ data, error }) => {
+                            if(data && !error) {
+                                const result = await useQuery({
+                                    query: GET_CONVERSATION_MESSAGES_QUERY,
+                                    variables: { convId: conversation?.id }
+                                }).execute()
+                                if (result.data) {
+                                    const convIndex = state.conversations.findIndex((conv) => conv.id === conversation.id)
+                                    if (convIndex !== -1) {
+                                        state.conversations[convIndex].messages = result.data.getConversationMessages
+                                    }
+                                }
+                            }
+                        })
+                    }
                 }
-
                 if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
                     commit('setLoading', false)
 
@@ -157,7 +211,6 @@ export default {
                     $toast.error(graphqlError.message)
                 }
             } catch (error) {
-                console.error('Error during conversation creation:', error)
                 commit('setLoading', false)
                 $toast.error('Une erreur est survenue')
             }

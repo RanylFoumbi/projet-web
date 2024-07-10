@@ -1,4 +1,5 @@
 # compiled output
+/gql
 /dist
 node_modules
 

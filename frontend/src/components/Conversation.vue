@@ -42,33 +42,10 @@ import { ref, onMounted, watch } from 'vue'
 import Message from './Message.vue'
 import { $toast } from '../utils/toast'
 import { gql } from 'graphql-tag'
-import { useMutation, useQuery } from 'villus'
-import { Conversation, Message as MessageType, MessageInput } from '../gql/graphql'
+import { useMutation, useQuery, useSubscription } from 'villus'
+import { Conversation, Message as MessageType } from '../gql/graphql'
 import { useStore } from 'vuex'
-import DropdownMenu from './DropdownMenu.vue'
-
-const GET_CONVERSATION_MESSAGES_QUERY = gql`
-    query GetConversationMessages($convId: ID!) {
-        getConversationMessages(convId: $convId) {
-            content
-            createdAt
-            id
-            updatedAt
-            conversation {
-                createdAt
-                id
-                name
-                updatedAt
-            }
-            sender {
-                createdAt
-                id
-                username
-                updatedAt
-            }
-        }
-    }
-`
+import { GET_CONVERSATION_MESSAGES_QUERY, NEW_MESSAGE_SUBSCRIPTION } from '../store/modules/conversation'
 
 const SEND_MESSAGE_MUTATION = gql`
     mutation SendMessage($messageInput: MessageInput!) {
@@ -119,6 +96,15 @@ const getConversationMessages = async (convId: String) => {
         const { data } = await execute()
         if (data && data?.getConversationMessages) {
             messages.value = data.getConversationMessages
+            useSubscription({
+                query: NEW_MESSAGE_SUBSCRIPTION,
+                variables: { convId: props?.conversation?.id },
+            }, async ({ data, error }) => {
+                if(data && !error) {
+                    getConversationMessages(props?.conversation?.id)
+                }
+            })
+            scrollToBottom()
         }
 
         if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
@@ -126,7 +112,6 @@ const getConversationMessages = async (convId: String) => {
             $toast.error(graphqlError.message)
         }
     } catch (error) {
-        console.error('Error during conversation creation:', error)
         $toast.error('Une erreur est survenue')
     }
 }
@@ -142,7 +127,6 @@ const sendMessage = async () => {
                 conversation: props?.conversation?.id,
             },
         })
-
         if (data && data?.value?.sendMessage) {
             messages.value = [...messages.value, data.value.sendMessage]
             currentMessage.value = ''

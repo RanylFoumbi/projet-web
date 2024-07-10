@@ -10,10 +10,10 @@ export class Message {
   @Field(() => String)
   content: string;
 
-  @Field(() => User, { nullable: true })
+  @Field(() => User)
   sender: User;
 
-  @Field(() => Conversation, { nullable: true })
+  @Field(() => Conversation)
   conversation: Conversation;
 
   @Field(() => Date)

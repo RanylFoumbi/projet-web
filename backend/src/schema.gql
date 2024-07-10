@@ -36,10 +36,10 @@ type LoginResponse {
 """Message model"""
 type Message {
   content: String!
-  conversation: Conversation
+  conversation: Conversation!
   createdAt: DateTime!
   id: ID!
-  sender: User
+  sender: User!
   updatedAt: DateTime!
 }
 
@@ -81,7 +81,7 @@ type RegisterResponse {
 }
 
 type Subscription {
-  newMessage(convId: String!): Message
+  newMessage(convId: ID!): Message
 }
 
 """The `Upload` scalar type represents a file upload."""

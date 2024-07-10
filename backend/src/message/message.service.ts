@@ -39,12 +39,13 @@ export class MessageService {
         content: messageInput.content,
         userId: messageInput.sender,
         conversationId: messageInput.conversation,
-      },
+      }
     });
-
+    
     const cachedMessages = await this.redisService.get(
       messageInput.conversation,
     );
+
     let messages = JSON.parse(cachedMessages);
     if (typeof messages === 'object') {
       messages = [newMessage];

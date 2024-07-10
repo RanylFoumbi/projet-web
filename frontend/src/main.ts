@@ -1,5 +1,6 @@
 import { useClient, handleSubscriptions, defaultPlugins, useMutation, ClientPlugin } from 'villus'
 import { createClient as createWsClient } from 'graphql-ws'
+import './style.css'
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
@@ -10,6 +11,10 @@ import gql from 'graphql-tag'
 
 const wsClient = createWsClient({
     url: import.meta.env.VITE_API_SUBSCRIPTION_URL,
+    connectionParams: () => ({
+        reconnect: true,
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    }),
 })
 
 const subscriptionsHandler = handleSubscriptions((operation) => {
@@ -78,7 +83,7 @@ const withCredentials: ClientPlugin = ({ opContext }) => {
 
 const villusClient = useClient({
     url: import.meta.env.VITE_API_URL,
-    cachePolicy: 'cache-and-network',
+    cachePolicy: 'network-only',
     use: [withCredentials, authPluginWithRefresh, subscriptionsHandler, ...defaultPlugins()],
 })
 
