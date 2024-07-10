@@ -3,6 +3,7 @@ import { Conversation, CreateConversationDto, User } from '../../gql/graphql'
 import { gql } from 'graphql-tag'
 import { useMutation, useQuery } from 'villus'
 import { $toast } from '../../utils/toast'
+import store from '..'
 
 const CREATE_CONVERSATION_MUTATION = gql`
     mutation CreateConversation($convInput: CreateConversationDto!) {
@@ -36,6 +37,12 @@ const GET_CONVERSATIONS_QUERY = gql`
             users {
                 id
                 username
+            }
+            messages {
+                id
+                content
+                createdAt
+                updatedAt
             }
             createdAt
             updatedAt
@@ -116,8 +123,6 @@ export default {
                     variables: { userId },
                 })
 
-                console.log('>>>>>>>>>>>> isDone:', 'error:', error)
-
                 const { data } = await execute()
 
                 if (data && data?.getUserConversations) {
@@ -151,7 +156,10 @@ export default {
 
                 if (data && data?.findUserByName) {
                     commit('setLoading', false)
-                    commit('setUsers', data?.findUserByName)
+                    commit(
+                        'setUsers',
+                        data?.findUserByName.filter((user: User) => user.id !== store.getters['auth/user']?.id),
+                    )
                 }
 
                 if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {

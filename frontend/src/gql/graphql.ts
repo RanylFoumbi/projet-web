@@ -23,11 +23,11 @@ export type Scalars = {
 /** Conversation model */
 export type Conversation = {
     __typename?: 'Conversation'
-    createdAt?: Maybe<Scalars['String']['output']>
+    createdAt?: Maybe<Scalars['DateTime']['output']>
     id: Scalars['ID']['output']
     messages: Array<Message>
     name: Scalars['String']['output']
-    updatedAt?: Maybe<Scalars['String']['output']>
+    updatedAt?: Maybe<Scalars['DateTime']['output']>
     users: Array<User>
 }
 
@@ -169,10 +169,10 @@ export type GetConversationMessagesQuery = {
         updatedAt: any
         conversation?: {
             __typename?: 'Conversation'
-            createdAt?: string | null
+            createdAt?: any | null
             id: string
             name: string
-            updatedAt?: string | null
+            updatedAt?: any | null
         } | null
         sender?: {
             __typename?: 'User'
@@ -198,10 +198,10 @@ export type SendMessageMutation = {
         updatedAt: any
         conversation?: {
             __typename?: 'Conversation'
-            createdAt?: string | null
+            createdAt?: any | null
             id: string
             name: string
-            updatedAt?: string | null
+            updatedAt?: any | null
         } | null
     }
 }
@@ -228,9 +228,9 @@ export type LoginMutation = {
             username: string
             conversations: Array<{
                 __typename?: 'Conversation'
-                createdAt?: string | null
+                createdAt?: any | null
                 id: string
-                updatedAt?: string | null
+                updatedAt?: any | null
                 messages: Array<{ __typename?: 'Message'; content: string; createdAt: any; id: string; updatedAt: any }>
                 users: Array<{
                     __typename?: 'User'
@@ -266,6 +266,10 @@ export type RegisterMutation = {
     }
 }
 
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>
+
+export type LogoutMutation = { __typename?: 'Mutation'; logout: string }
+
 export type CreateConversationMutationVariables = Exact<{
     convInput: CreateConversationDto
 }>
@@ -274,9 +278,9 @@ export type CreateConversationMutation = {
     __typename?: 'Mutation'
     createConversation: {
         __typename?: 'Conversation'
-        createdAt?: string | null
+        createdAt?: any | null
         id: string
-        updatedAt?: string | null
+        updatedAt?: any | null
         messages: Array<{ __typename?: 'Message'; content: string; createdAt: any; id: string; updatedAt: any }>
         users: Array<{
             __typename?: 'User'
@@ -300,8 +304,8 @@ export type GetUserConversationsQuery = {
         __typename?: 'Conversation'
         id: string
         name: string
-        createdAt?: string | null
-        updatedAt?: string | null
+        createdAt?: any | null
+        updatedAt?: any | null
         users: Array<{ __typename?: 'User'; id: string; username: string }>
     }>
 }
@@ -645,6 +649,20 @@ export const RegisterDocument = {
         },
     ],
 } as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>
+export const LogoutDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'Logout' },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [{ kind: 'Field', name: { kind: 'Name', value: 'logout' } }],
+            },
+        },
+    ],
+} as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>
 export const CreateConversationDocument = {
     kind: 'Document',
     definitions: [

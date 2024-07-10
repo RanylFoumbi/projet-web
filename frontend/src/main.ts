@@ -1,6 +1,7 @@
 import { useClient, handleSubscriptions, defaultPlugins, useMutation, ClientPlugin } from 'villus'
 import { createClient as createWsClient } from 'graphql-ws'
 import { createApp } from 'vue'
+import './style.css'
 import App from './App.vue'
 import router from './router'
 import store from './store/index.js'
@@ -62,9 +63,9 @@ const authPluginWithRefresh = ({ opContext, afterQuery }) => {
                         result.data = retryResult.data
                         result.errors = retryResult.errors
                     } catch (error) {
-                      store.dispatch('auth/logout')
+                        store.dispatch('auth/logout')
                     }
-                  break
+                    break
                 }
             }
         }
@@ -72,8 +73,8 @@ const authPluginWithRefresh = ({ opContext, afterQuery }) => {
 }
 
 const withCredentials: ClientPlugin = ({ opContext }) => {
-  opContext.credentials = 'include';
-};
+    opContext.credentials = 'include'
+}
 
 const villusClient = useClient({
     url: import.meta.env.VITE_API_URL,

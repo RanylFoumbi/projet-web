@@ -40,6 +40,7 @@ export class AuthResolver {
   @Mutation(() => String)
   async refreshToken(@Context() context: { req: Request; res: Response }) {
     try {
+      console.log('>>>>>>>>>>>>> context.req', context.req, context.res);
       return this.authService.refreshToken(context.req, context.res);
     } catch (error) {
       throw new BadRequestException(error.message);
