@@ -33,13 +33,13 @@
         >
             <ul class="py-2" aria-labelledby="user-menu-button">
                 <li>
-                    <a @click="toggleDropdown" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a @click="leaveConversation" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="mdi mdi-logout text-lg"></i>
                         Quitter la conversation</a
                     >
                 </li>
-                <li>
-                    <a @click="toggleDropdown" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">
+                <li v-if="conversation.creatorId === store.state.auth.user.id">
+                    <a @click="deleteConversation" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">
                         <i class="mdi mdi-delete text-lg"></i>
                         Supprimer la conversation</a
                     >
@@ -51,10 +51,33 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { Conversation } from '../gql/graphql'
+
+const store = useStore()
+
+const props = defineProps<{
+    conversation: Conversation
+}>()
 
 const isDropdownVisible = ref(false)
 
 const toggleDropdown = () => {
     isDropdownVisible.value = !isDropdownVisible.value
+}
+
+const leaveConversation = async () => {
+    console.log('Leave conversation')
+    // await store.dispatch('conversations/leaveConversation', props.conversation.id, store.state.auth.user.id)
+    // toggleDropdown()
+}
+
+const deleteConversation = async () => {
+    console.log('Delete conversation')
+    await store.dispatch('conversation/deleteConversation', {
+        convId: props.conversation.id,
+        userId: store.state.auth.user.id,
+    })
+    toggleDropdown()
 }
 </script>

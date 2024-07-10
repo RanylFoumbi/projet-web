@@ -33,7 +33,7 @@
                     </div>
                     <div class="flex-1 pl-5">
                         <h3 class="font-semibold capitalize">{{ conversation?.name }}</h3>
-                        <p class="text-sm text-gray-500">{{ lastConvMessage(conversation) }}</p>
+                        <p class="text-sm text-gray-500 capitalize italic">{{ lastConvMessage(conversation) }}</p>
                     </div>
                     <div class="flex flex-col items-end">
                         <span class="text-sm text-gray-500">
@@ -89,7 +89,7 @@ const isModalOpen = ref(false)
 
 const lastConvMessage = (conversation: ConversationType) =>
     computed(() => {
-        return conversation.messages[conversation.messages.length - 1]?.content || ''
+        return conversation.messages[conversation.messages.length - 1]?.content || 'Conversation créée'
     })
 
 const openModal = async () => {

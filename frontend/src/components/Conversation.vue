@@ -9,13 +9,13 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-grey-darkest font-bold capitalize">{{ conversation?.name }}</p>
-                    <p class="text-grey-darker text-xs mt-1">
+                    <p class="text-grey-darker text-xs mt-1 italic capitalize">
                         {{ conversation?.users?.map((user) => user?.username).join(', ') }}
                     </p>
                 </div>
             </div>
 
-            <DropdownMenu />
+            <DropdownMenu :conversation="conversation" />
         </div>
         <div class="h-screen overflow-y-auto p-4 pb-36" ref="messagesContainer">
             <Message v-for="(message, index) in messages" :key="index" :message="message" />
@@ -83,6 +83,12 @@ const SEND_MESSAGE_MUTATION = gql`
                 name
                 updatedAt
             }
+            sender {
+                createdAt
+                id
+                username
+                updatedAt
+            }
         }
     }
 `
@@ -138,11 +144,7 @@ const sendMessage = async () => {
         })
 
         if (data && data?.value?.sendMessage) {
-            const newMessage = {
-                ...data.value.sendMessage,
-                sender: store.state.auth.user,
-            }
-            messages.value = [...messages.value, newMessage]
+            messages.value = [...messages.value, data.value.sendMessage]
             currentMessage.value = ''
             scrollToBottom()
         }

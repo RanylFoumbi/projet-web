@@ -57,7 +57,7 @@
                                 <select
                                     multiple
                                     v-model="selectedUsers"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                    class="bg-gray-50 border border-gray-300 capitalize text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                 >
                                     <option v-for="user in props?.users" :key="user?.id" :value="user?.id">
                                         {{ user?.username }}
@@ -110,7 +110,8 @@ const selectedUsers = ref<String[]>([])
 const createConversation = async () => {
     await store.dispatch('conversation/createConversation', {
         name: name.value,
-        users: selectedUsers.value,
+        creatorId: store.state.auth.user?.id,
+        users: [...selectedUsers.value, store.state.auth.user?.id],
     })
     props.closeModal()
     name.value = ''
