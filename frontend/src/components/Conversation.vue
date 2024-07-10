@@ -2,28 +2,20 @@
     <div class="conversation">
         <div class="flex items-center justify-between bg-white border-b border-gray-300 p-2">
             <div class="flex items-center">
-                <div>
-                    <img class="w-10 h-10 rounded-full" src="https://randomuser.me/api/portraits" />
+                <div
+                    class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-200 rounded-full"
+                >
+                    <span class="text-gray-500 capitalize">{{ conversation?.name?.substring(0, 1) }}</span>
                 </div>
                 <div class="ml-4">
-                    <p class="text-grey-darkest font-bold">Conversation {{ conversation?.name }}</p>
-                    <p class="text-grey-darker text-xs mt-1">
+                    <p class="text-grey-darkest font-bold capitalize">{{ conversation?.name }}</p>
+                    <p class="text-grey-darker text-xs mt-1 italic capitalize">
                         {{ conversation?.users?.map((user) => user?.username).join(', ') }}
                     </p>
                 </div>
             </div>
 
-            <div class="flex">
-                <div class="ml-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                        <path
-                            fill="#263238"
-                            fill-opacity=".6"
-                            d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"
-                        ></path>
-                    </svg>
-                </div>
-            </div>
+            <DropdownMenu :conversation="conversation" />
         </div>
         <div class="h-screen overflow-y-auto p-4 pb-36" ref="messagesContainer">
             <Message v-for="(message, index) in messages" :key="index" :message="message" />
@@ -53,6 +45,7 @@ import { gql } from 'graphql-tag'
 import { useMutation, useQuery } from 'villus'
 import { Conversation, Message as MessageType, MessageInput } from '../gql/graphql'
 import { useStore } from 'vuex'
+import DropdownMenu from './DropdownMenu.vue'
 
 const GET_CONVERSATION_MESSAGES_QUERY = gql`
     query GetConversationMessages($convId: ID!) {
@@ -88,6 +81,12 @@ const SEND_MESSAGE_MUTATION = gql`
                 createdAt
                 id
                 name
+                updatedAt
+            }
+            sender {
+                createdAt
+                id
+                username
                 updatedAt
             }
         }
@@ -145,7 +144,7 @@ const sendMessage = async () => {
         })
 
         if (data && data?.value?.sendMessage) {
-            getConversationMessages(props?.conversation?.id)
+            messages.value = [...messages.value, data.value.sendMessage]
             currentMessage.value = ''
             scrollToBottom()
         }

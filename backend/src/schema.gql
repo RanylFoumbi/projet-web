@@ -4,15 +4,17 @@
 
 """Conversation model"""
 type Conversation {
-  createdAt: String
+  createdAt: DateTime
+  creatorId: ID!
   id: ID!
   messages: [Message!]!
   name: String!
-  updatedAt: String
+  updatedAt: DateTime
   users: [User!]!
 }
 
 input CreateConversationDto {
+  creatorId: ID!
   name: String!
   users: [ID!]!
 }
@@ -50,7 +52,7 @@ input MessageInput {
 
 type Mutation {
   createConversation(convInput: CreateConversationDto!): Conversation!
-  deleteConversation(convId: ID!): Conversation!
+  deleteConversation(convId: ID!, userId: ID!): Conversation!
   login(loginInput: LoginDto!): LoginResponse!
   logout: String!
   refreshToken: String!

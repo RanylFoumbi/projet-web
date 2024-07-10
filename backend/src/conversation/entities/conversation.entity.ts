@@ -13,12 +13,15 @@ export class Conversation {
   @Field(() => [Message])
   messages: Message[];
 
+  @Field(() => ID)
+  creatorId: string;
+
   @Field(() => User)
   users: User[];
 
-  @Field(() => String, { nullable: true })
+  @Field(() => Date, { nullable: true })
   createdAt: Date;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 }

@@ -60,8 +60,11 @@ export class ConversationResolver {
 
   @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ConversationEntity)
-  async deleteConversation(@Args('convId', { type: () => ID }) convId: string) {
-    return this.convService.deleteConversation(convId);
+  async deleteConversation(
+    @Args('convId', { type: () => ID }) convId: string,
+    @Args('userId', { type: () => ID }) userId: string,
+  ) {
+    return this.convService.deleteConversation(convId, userId);
   }
 
   @ResolveField('messages', () => [MessageEntity])

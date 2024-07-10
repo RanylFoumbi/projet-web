@@ -17,6 +17,7 @@ export class ConversationService {
     const conversation = await this.prismaService.conversation.create({
       data: {
         name: convDto.name,
+        creatorId: convDto.creatorId,
         users: { connect: convDto.users.map((userId) => ({ id: userId })) },
       },
     });
@@ -38,9 +39,15 @@ export class ConversationService {
     return conversations || [];
   }
 
-  async deleteConversation(convId: string): Promise<Conversation> {
+  async deleteConversation(
+    convId: string,
+    userId: string,
+  ): Promise<Conversation> {
     const conversation = await this.prismaService.conversation.delete({
-      where: { id: convId },
+      where: {
+        id: convId,
+        creatorId: userId,
+      },
     });
     this.queueManagerService.deleteQueue(convId);
     return conversation;

@@ -3,8 +3,15 @@
         <!-- Sidebar -->
         <div class="w-full sm:w-1/4 flex flex-col bg-white border-r border-gray-300">
             <!-- Sidebar Header -->
-            <header class="p-4 border-b border-gray-300 flex justify-between items-center bg-indigo-600 text-white">
-                <h1 class="text-md font-semibold">Mes conversations</h1>
+            <header class="p-4 border-b border-gray-300 flex justify-between items-center bg-indigo-600">
+                <div
+                    class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-200 rounded-full"
+                >
+                    <span class="text-indigo-500 capitalize">{{
+                        store?.state?.auth?.user?.username?.substring(0, 1)
+                    }}</span>
+                </div>
+                <h1 class="text-md font-semibold text-white">Mes conversations</h1>
                 <button @click="openModal" class="bg-indigo-500 text-white px-4 py-2 rounded-md">
                     <i class="mdi mdi-plus"></i>
                 </button>
@@ -22,10 +29,11 @@
                     <div
                         class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-200 rounded-full"
                     >
-                        <span class="font-medium text-green-600">{{ index }}</span>
+                        <span class="text-gray-500 capitalize">{{ conversation?.name?.charAt(0) }}</span>
                     </div>
                     <div class="flex-1 pl-5">
-                        <h2 class="text-lg font-semibold">{{ conversation?.name }}</h2>
+                        <h3 class="font-semibold capitalize">{{ conversation?.name }}</h3>
+                        <p class="text-sm text-gray-500 capitalize italic">{{ lastConvMessage(conversation) }}</p>
                     </div>
                     <div class="flex flex-col items-end">
                         <span class="text-sm text-gray-500">
@@ -44,7 +52,7 @@
 
             <footer class="bg-white border-t border-gray-300 flex justify-center p-4">
                 <button @click="logout" class="bg-indigo-500 text-white px-4 py-2 rounded-md w-full">
-                    Se déconnecter
+                    <i class="mdi mdi-logout text-xl mr-4"></i> Se déconnecter
                 </button>
             </footer>
         </div>
@@ -79,9 +87,14 @@ const conversationList = computed(() => store.state.conversation.conversations)
 
 const isModalOpen = ref(false)
 
+const lastConvMessage = (conversation: ConversationType) =>
+    computed(() => {
+        return conversation.messages[conversation.messages.length - 1]?.content || 'Conversation créée'
+    })
+
 const openModal = async () => {
     isModalOpen.value = true
-    await store.dispatch('conversation/getUsers', 't')
+    await store.dispatch('conversation/getUsers', '')
     users.value = store.state.conversation?.users || []
 }
 

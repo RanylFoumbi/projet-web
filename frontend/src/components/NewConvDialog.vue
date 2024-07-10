@@ -57,7 +57,7 @@
                                 <select
                                     multiple
                                     v-model="selectedUsers"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                    class="bg-gray-50 border border-gray-300 capitalize text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                 >
                                     <option v-for="user in props?.users" :key="user?.id" :value="user?.id">
                                         {{ user?.username }}
@@ -68,7 +68,7 @@
                         <button
                             type="button"
                             @click="createConversation"
-                            class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                            class="text-white inline-flex items-center bg-indigo-600 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                         >
                             <svg
                                 class="me-1 -ms-1 w-5 h-5"
@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, defineProps } from 'vue'
 import { User } from '../gql/graphql.ts'
 import { useStore } from 'vuex'
 
@@ -108,10 +108,10 @@ const name = ref('')
 const selectedUsers = ref<String[]>([])
 
 const createConversation = async () => {
-    console.log('>>>>>>>>>>>>> ', name.value, props.users, selectedUsers.value)
     await store.dispatch('conversation/createConversation', {
         name: name.value,
-        users: selectedUsers.value,
+        creatorId: store.state.auth.user?.id,
+        users: [...selectedUsers.value, store.state.auth.user?.id],
     })
     props.closeModal()
     name.value = ''

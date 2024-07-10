@@ -3,13 +3,16 @@ import { Conversation, CreateConversationDto, User } from '../../gql/graphql'
 import { gql } from 'graphql-tag'
 import { useMutation, useQuery } from 'villus'
 import { $toast } from '../../utils/toast'
+import store from '..'
 
 const CREATE_CONVERSATION_MUTATION = gql`
     mutation CreateConversation($convInput: CreateConversationDto!) {
         createConversation(convInput: $convInput) {
             createdAt
             id
+            name
             updatedAt
+            creatorId
             messages {
                 content
                 createdAt
@@ -33,9 +36,16 @@ const GET_CONVERSATIONS_QUERY = gql`
         getUserConversations(userId: $userId) {
             id
             name
+            creatorId
             users {
                 id
                 username
+            }
+            messages {
+                id
+                content
+                createdAt
+                updatedAt
             }
             createdAt
             updatedAt
@@ -52,6 +62,18 @@ const GET_USERS_QUERY = gql`
             password
             updatedAt
             username
+        }
+    }
+`
+
+const DELETE_CONVERSATION_MUTATION = gql`
+    mutation DeleteConversation($convId: ID!, $userId: ID!) {
+        deleteConversation(convId: $convId, userId: $userId) {
+            createdAt
+            id
+            name
+            creatorId
+            updatedAt
         }
     }
 `
@@ -83,11 +105,14 @@ export default {
         },
     },
     actions: {
-        async createConversation({ commit, state }: ConvActionContext, { name, users }: CreateConversationDto) {
+        async createConversation(
+            { commit, state }: ConvActionContext,
+            { name, creatorId, users }: CreateConversationDto,
+        ) {
             commit('setLoading', true)
             try {
                 const { execute, data, isDone, error } = useMutation(CREATE_CONVERSATION_MUTATION)
-                await execute({ convInput: { name, users } })
+                await execute({ convInput: { name, creatorId, users } })
 
                 if (isDone.value && data?.value?.createConversation) {
                     commit('setLoading', false)
@@ -108,6 +133,7 @@ export default {
                 $toast.error('Une erreur est survenue')
             }
         },
+
         async getConversations({ commit }: ConvActionContext, userId: String) {
             commit('setLoading', true)
             try {
@@ -115,8 +141,6 @@ export default {
                     query: GET_CONVERSATIONS_QUERY,
                     variables: { userId },
                 })
-
-                console.log('>>>>>>>>>>>> isDone:', 'error:', error)
 
                 const { data } = await execute()
 
@@ -151,7 +175,10 @@ export default {
 
                 if (data && data?.findUserByName) {
                     commit('setLoading', false)
-                    commit('setUsers', data?.findUserByName)
+                    commit(
+                        'setUsers',
+                        data?.findUserByName.filter((user: User) => user.id !== store.getters['auth/user']?.id),
+                    )
                 }
 
                 if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
@@ -163,6 +190,35 @@ export default {
                 }
             } catch (error) {
                 console.error('Error during conversation creation:', error)
+                commit('setLoading', false)
+                $toast.error('Une erreur est survenue')
+            }
+        },
+
+        async deleteConversation({ commit, state }: ConvActionContext, dataToDelete: { convId: string; userId: string }) {
+            commit('setLoading', true)
+            try {
+                const { execute, data, isDone, error } = useMutation(DELETE_CONVERSATION_MUTATION)
+                await execute(dataToDelete)
+
+                if (isDone.value && data?.value?.deleteConversation) {
+                    commit('setLoading', false)
+                    commit(
+                        'setConversations',
+                        state.conversations.filter((conv: Conversation) => conv.id !== dataToDelete.convId),
+                    )
+                    $toast.success('Conversation supprimée!')
+                }
+
+                if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {
+                    commit('setLoading', false)
+
+                    const graphqlError = error.value.graphqlErrors[0] as any
+
+                    $toast.error(graphqlError.message)
+                }
+            } catch (error) {
+                console.error('Error during conversation deletion:', error)
                 commit('setLoading', false)
                 $toast.error('Une erreur est survenue')
             }

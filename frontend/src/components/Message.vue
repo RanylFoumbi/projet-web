@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps, onMounted } from 'vue'
+import { computed, defineProps } from 'vue'
 import { Message } from '../gql/graphql'
 import { formatDateToFR } from '../utils/formatDate'
 import { useStore } from 'vuex'
@@ -34,12 +34,8 @@ const isMine = computed(() => props?.message?.sender?.id === store.state.auth.us
 
 const formatName = (name: string) => {
     if (!name) return ''
-    return name.charAt(0).toUpperCase() + name.slice(1)
+    return name?.charAt(0).toUpperCase() + name?.slice(1)
 }
-
-onMounted(() => {
-    console.log('Message mounted', props.message)
-})
 </script>
 
 <style scoped></style>
