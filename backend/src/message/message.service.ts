@@ -13,11 +13,10 @@ export class MessageService {
 
   async getConversationMessages(convId: string): Promise<Message[]> {
     
-    const cachedMessages = await this.redisService.get(convId);
-
-    if (cachedMessages && typeof cachedMessages !== 'object') {
-      const parsedMessages = JSON.parse(cachedMessages);
-      const messagesWithDates = parsedMessages.map((msg: any) => ({
+    let cachedMessages = await this.redisService.get(convId);
+    cachedMessages = JSON.parse(cachedMessages);
+    if (cachedMessages &&  Array.isArray(cachedMessages)) {
+      const messagesWithDates = cachedMessages.map((msg: any) => ({
       ...msg,
       createdAt: new Date(msg.createdAt),
       updatedAt: new Date(msg.updatedAt),
