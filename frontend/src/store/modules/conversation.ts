@@ -86,7 +86,7 @@ export type ConversationState = {
 
 type ConvActionContext = ActionContext<ConversationState, ConversationState>
 
-export default {
+export const conversation ={
     namespaced: true,
     state: {
         loading: false,
@@ -195,7 +195,10 @@ export default {
             }
         },
 
-        async deleteConversation({ commit, state }: ConvActionContext, dataToDelete: { convId: string; userId: string }) {
+        async deleteConversation(
+            { commit, state }: ConvActionContext,
+            dataToDelete: { convId: string; userId: string },
+        ) {
             commit('setLoading', true)
             try {
                 const { execute, data, isDone, error } = useMutation(DELETE_CONVERSATION_MUTATION)
