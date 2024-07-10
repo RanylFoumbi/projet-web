@@ -1,7 +1,14 @@
 import { createStore } from 'vuex'
 import VuexPersister from 'vuex-persister'
 import { AuthState, auth } from './modules/auth'
-import { ConversationState, conversation } from './modules/conversation'
+import {
+    ConversationState,
+    conversation,
+    GET_CONVERSATION_MESSAGES_QUERY,
+    NEW_MESSAGE_SUBSCRIPTION,
+} from './modules/conversation'
+
+export { GET_CONVERSATION_MESSAGES_QUERY, NEW_MESSAGE_SUBSCRIPTION }
 
 const vuexPersister = new VuexPersister({})
 

@@ -6,6 +6,7 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from '@nestjs/graphql';
 import { MessageService } from './message.service';
 import { Message as MessageEntity } from './entities/message.entity';
@@ -45,6 +46,14 @@ export class MessageResolver {
       newMessage: message,
     });
     return message;
+  }
+
+  @Subscription(() => MessageEntity, {
+    nullable: true,
+    resolve: (value) => value.newMessage,
+  })
+  async newMessage(@Args('convId', { type: () => ID }) convId: string) {
+    return this.pubSub.asyncIterator(`newMessage.${convId}`);
   }
 
   @ResolveField('sender', () => UserEntity)
