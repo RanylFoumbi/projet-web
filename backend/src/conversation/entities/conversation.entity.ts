@@ -16,9 +16,9 @@ export class Conversation {
   @Field(() => User)
   users: User[];
 
-  @Field(() => String, { nullable: true })
+  @Field(() => Date, { nullable: true })
   createdAt: Date;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 }

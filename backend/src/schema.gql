@@ -4,11 +4,11 @@
 
 """Conversation model"""
 type Conversation {
-  createdAt: String
+  createdAt: DateTime
   id: ID!
   messages: [Message!]!
   name: String!
-  updatedAt: String
+  updatedAt: DateTime
   users: [User!]!
 }
 

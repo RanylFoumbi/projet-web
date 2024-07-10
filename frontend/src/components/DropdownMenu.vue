@@ -12,40 +12,34 @@
             </div>
         </div>
         <div
-        :class="{
-            'hidden': !isDropdownVisible,
-            'absolute': isDropdownVisible,
-            'right-0': isDropdownVisible,
-            'z-10': isDropdownVisible,
-            'mt-2': isDropdownVisible,
-            'w-56': isDropdownVisible,
-            'origin-top-right': isDropdownVisible,
-            'rounded-md': isDropdownVisible,
-            'bg-white': isDropdownVisible,
-            'shadow-lg': isDropdownVisible,
-            'ring-1': isDropdownVisible,
-            'ring-black': isDropdownVisible,
-            'ring-opacity-5': isDropdownVisible,
-            'focus:outline-none': isDropdownVisible,
-            'cursor-pointer': isDropdownVisible,
-        }"
+            :class="{
+                hidden: !isDropdownVisible,
+                absolute: isDropdownVisible,
+                'right-0': isDropdownVisible,
+                'z-10': isDropdownVisible,
+                'mt-2': isDropdownVisible,
+                'w-56': isDropdownVisible,
+                'origin-top-right': isDropdownVisible,
+                'rounded-md': isDropdownVisible,
+                'bg-white': isDropdownVisible,
+                'shadow-lg': isDropdownVisible,
+                'ring-1': isDropdownVisible,
+                'ring-black': isDropdownVisible,
+                'ring-opacity-5': isDropdownVisible,
+                'focus:outline-none': isDropdownVisible,
+                'cursor-pointer': isDropdownVisible,
+            }"
             id="user-dropdown"
         >
             <ul class="py-2" aria-labelledby="user-menu-button">
                 <li>
-                    <a
-                        @click="toggleDropdown"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
+                    <a @click="toggleDropdown" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="mdi mdi-logout text-lg"></i>
                         Quitter la conversation</a
                     >
                 </li>
                 <li>
-                    <a
-                        @click="toggleDropdown"
-                        class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100 "
-                        >
+                    <a @click="toggleDropdown" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">
                         <i class="mdi mdi-delete text-lg"></i>
                         Supprimer la conversation</a
                     >
