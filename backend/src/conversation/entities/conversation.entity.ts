@@ -13,6 +13,9 @@ export class Conversation {
   @Field(() => [Message])
   messages: Message[];
 
+  @Field(() => ID)
+  creatorId: string;
+
   @Field(() => User)
   users: User[];
 

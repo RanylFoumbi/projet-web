@@ -9,6 +9,10 @@ export class CreateConversationDto {
   })
   users: string[];
 
+  @Field(() => ID)
+  @IsNotEmpty({ message: 'CreatorId is required.' })
+  creatorId: string;
+
   @Field()
   @IsNotEmpty({ message: 'Conversation name is required.' })
   name: string;
