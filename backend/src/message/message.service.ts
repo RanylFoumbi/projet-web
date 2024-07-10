@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { QueueManagerService } from 'src/queueManager/queueManager.service';
-import { RedisService } from 'src/queueManager/redis.service';
+import { RedisService } from 'src/cashManager/redis.service';
 import { MessageInput } from './dto/message.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Message } from '@prisma/client';
@@ -8,7 +7,6 @@ import { Message } from '@prisma/client';
 @Injectable()
 export class MessageService {
   constructor(
-    private readonly queueManagerService: QueueManagerService,
     private readonly redisService: RedisService,
     private readonly prismaService: PrismaService,
   ) {}
@@ -55,12 +53,6 @@ export class MessageService {
       messageInput.conversation,
       JSON.stringify(messages),
     );
-
-    const queue = await this.queueManagerService.getQueue(
-      messageInput.conversation,
-    );
-
-    await queue.add('sendMessage', newMessage);
     return newMessage;
   }
 }

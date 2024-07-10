@@ -1,9 +1,54 @@
 import { ActionContext } from 'vuex'
 import { Conversation, CreateConversationDto, User } from '../../gql/graphql'
 import { gql } from 'graphql-tag'
-import { useMutation, useQuery } from 'villus'
+import { useMutation, useQuery, useSubscription } from 'villus'
 import { $toast } from '../../utils/toast'
 import store from '..'
+
+export const GET_CONVERSATION_MESSAGES_QUERY = gql`
+    query GetConversationMessages($convId: ID!) {
+        getConversationMessages(convId: $convId) {
+            content
+            createdAt
+            id
+            updatedAt
+            conversation {
+                createdAt
+                id
+                name
+                updatedAt
+            }
+            sender {
+                createdAt
+                id
+                username
+                updatedAt
+            }
+        }
+    }
+`
+export const NEW_MESSAGE_SUBSCRIPTION = gql`
+    subscription NewMessage($convId: ID!) {
+        newMessage(convId: $convId) {
+            content
+            createdAt
+            id
+            updatedAt
+            sender {
+                createdAt
+                id
+                username
+                updatedAt
+            }
+            conversation {
+                createdAt
+                id
+                name
+                updatedAt
+            }
+        }
+    }
+`
 
 const CREATE_CONVERSATION_MUTATION = gql`
     mutation CreateConversation($convInput: CreateConversationDto!) {
@@ -146,7 +191,7 @@ export const conversation = {
             }
         },
 
-        async getConversations({ commit }: ConvActionContext, userId: String) {
+        async getConversations({ commit, state }: ConvActionContext, userId: String) {
             commit('setLoading', true)
             try {
                 const { execute, error } = useQuery({
@@ -159,6 +204,27 @@ export const conversation = {
                 if (data && data?.getUserConversations) {
                     commit('setLoading', false)
                     commit('setConversations', data?.getUserConversations)
+
+                    for (const item of data?.getUserConversations) {
+                        useSubscription(
+                            {
+                                query: NEW_MESSAGE_SUBSCRIPTION,
+                                variables: { convId: item.id },
+                            },
+                            async ({ data, error }) => {
+                                if (data && !error) {
+                                    const newMessage = data.newMessage
+                                    const conversation = state.conversations.find(
+                                        (conv: Conversation) => conv.id === newMessage.conversation.id,
+                                    )
+
+                                    if (conversation) {
+                                        conversation.messages.push(newMessage)
+                                    }
+                                }
+                            },
+                        )
+                    }
                 }
 
                 if (error && error.value?.graphqlErrors !== undefined && error.value.graphqlErrors[0]) {

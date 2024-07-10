@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
-import { QueueManagerModule } from './queueManager/queueManager.module';
+import { CashManagerModule } from './cashManager/cashManager.module';
 import { TokenService } from './auth/token.service';
 import { join } from 'path';
 
@@ -26,7 +26,7 @@ const pubSub = new RedisPubSub({
       isGlobal: true,
       envFilePath: '../.env',
     }),
-    QueueManagerModule,
+    CashManagerModule,
     AppRoutingModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       imports: [ConfigModule, AppModule],
