@@ -3,7 +3,6 @@ import {
   ID,
   Resolver,
   Query,
-  Subscription,
   Mutation,
   ResolveField,
   Parent,
@@ -12,13 +11,13 @@ import { Conversation as ConversationEntity } from './entities/conversation.enti
 import { Message as MessageEntity } from '../message/entities/message.entity';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { Conversation } from '@prisma/client';
-import { User as UserEntity } from 'src/user/entity/user.entity';
+import { User as UserEntity } from '../user/entity/user.entity';
 import { UseFilters } from '@nestjs/common';
-import { GraphQLErrorFilter } from 'src/utils/custom-exception.fileter';
+import { GraphQLErrorFilter } from '../utils/custom-exception.fileter';
 import { UseGuards } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { GraphqlAuthGuard } from '../auth/graphql-auth.guard';
 
 @Resolver(() => ConversationEntity)
 export class ConversationResolver {

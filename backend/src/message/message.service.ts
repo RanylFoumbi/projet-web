@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { RedisService } from 'src/cashManager/redis.service';
+import { RedisService } from '../cashManager/redis.service';
 import { MessageInput } from './dto/message.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { Message } from '@prisma/client';
 
 @Injectable()
@@ -12,13 +12,20 @@ export class MessageService {
   ) {}
 
   async getConversationMessages(convId: string): Promise<Message[]> {
-    const cachedMessages = JSON.parse(await this.redisService.get(convId));
+    
+    const cachedMessages = await this.redisService.get(convId);
 
     if (cachedMessages && typeof cachedMessages !== 'object') {
-      console.log('Returning cached messages', cachedMessages);
-      return cachedMessages;
+      const parsedMessages = JSON.parse(cachedMessages);
+      const messagesWithDates = parsedMessages.map((msg: any) => ({
+      ...msg,
+      createdAt: new Date(msg.createdAt),
+      updatedAt: new Date(msg.updatedAt),
+    }));
+    return messagesWithDates;
     }
-    const convMessages = this.prismaService.message.findMany({
+
+    const convMessages = await this.prismaService.message.findMany({
       where: {
         conversationId: convId,
       },
