@@ -123,7 +123,7 @@ export type ConversationState = {
 
 type ConvActionContext = ActionContext<ConversationState, ConversationState>
 
-export default {
+export const conversation ={
     namespaced: true,
     state: {
         loading: false,
@@ -183,18 +183,18 @@ export default {
                 if (data && data?.getUserConversations) {
                     commit('setLoading', false)
                     commit('setConversations', data?.getUserConversations)
-                    for (const conversation of data?.getUserConversations) {
+                    for (const item of data?.getUserConversations) {
                         useSubscription({
                             query: NEW_MESSAGE_SUBSCRIPTION,
-                            variables: { convId: conversation.id },
+                            variables: { convId: item.id },
                         }, async ({ data, error }) => {
                             if(data && !error) {
                                 const result = await useQuery({
                                     query: GET_CONVERSATION_MESSAGES_QUERY,
-                                    variables: { convId: conversation?.id }
+                                    variables: { convId: item?.id }
                                 }).execute()
                                 if (result.data) {
-                                    const convIndex = state.conversations.findIndex((conv) => conv.id === conversation.id)
+                                    const convIndex = state.conversations.findIndex((conv) => conv.id === item.id)
                                     if (convIndex !== -1) {
                                         state.conversations[convIndex].messages = result.data.getConversationMessages
                                     }
@@ -248,7 +248,10 @@ export default {
             }
         },
 
-        async deleteConversation({ commit, state }: ConvActionContext, dataToDelete: { convId: string; userId: string }) {
+        async deleteConversation(
+            { commit, state }: ConvActionContext,
+            dataToDelete: { convId: string; userId: string },
+        ) {
             commit('setLoading', true)
             try {
                 const { execute, data, isDone, error } = useMutation(DELETE_CONVERSATION_MUTATION)

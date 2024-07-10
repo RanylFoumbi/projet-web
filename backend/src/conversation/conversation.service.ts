@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { QueueManagerService } from 'src/queueManager/queueManager.service';
 import { PrismaService } from 'src/prisma.service';
 import { Conversation } from '@prisma/client';
 
 @Injectable()
 export class ConversationService {
   constructor(
-    private readonly queueManagerService: QueueManagerService,
     private readonly prismaService: PrismaService,
   ) {}
 
@@ -21,7 +19,6 @@ export class ConversationService {
         users: { connect: convDto.users.map((userId) => ({ id: userId })) },
       },
     });
-    this.queueManagerService.createQueue(conversation.id);
     return conversation;
   }
 
@@ -44,7 +41,6 @@ export class ConversationService {
         creatorId: userId,
       },
     });
-    this.queueManagerService.deleteQueue(convId);
     return conversation;
   }
 }

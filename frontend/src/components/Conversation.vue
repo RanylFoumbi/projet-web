@@ -45,7 +45,7 @@ import { gql } from 'graphql-tag'
 import { useMutation, useQuery, useSubscription } from 'villus'
 import { Conversation, Message as MessageType } from '../gql/graphql'
 import { useStore } from 'vuex'
-import { GET_CONVERSATION_MESSAGES_QUERY, NEW_MESSAGE_SUBSCRIPTION } from '../store/modules/conversation'
+import { GET_CONVERSATION_MESSAGES_QUERY, NEW_MESSAGE_SUBSCRIPTION } from '../store/index'
 
 const SEND_MESSAGE_MUTATION = gql`
     mutation SendMessage($messageInput: MessageInput!) {
