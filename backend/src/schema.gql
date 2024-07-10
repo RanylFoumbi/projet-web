@@ -53,6 +53,7 @@ input MessageInput {
 type Mutation {
   createConversation(convInput: CreateConversationDto!): Conversation!
   deleteConversation(convId: ID!, userId: ID!): Conversation!
+  leaveConversation(convId: ID!, userId: ID!): Conversation!
   login(loginInput: LoginDto!): LoginResponse!
   logout: String!
   refreshToken: String!
