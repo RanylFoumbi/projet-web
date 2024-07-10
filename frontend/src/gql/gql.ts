@@ -13,8 +13,6 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    '\n    query GetConversationMessages($convId: ID!) {\n        getConversationMessages(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n':
-        types.GetConversationMessagesDocument,
     '\n    mutation SendMessage($messageInput: MessageInput!) {\n        sendMessage(messageInput: $messageInput) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n':
         types.SendMessageDocument,
     '\n    mutation RefreshToken {\n        refreshToken\n    }\n': types.RefreshTokenDocument,
@@ -23,6 +21,10 @@ const documents = {
     '\n    mutation Register($registerInput: RegisterDto!) {\n        register(registerInput: $registerInput) {\n            user {\n                createdAt\n                email\n                id\n                password\n                updatedAt\n                username\n            }\n        }\n    }\n':
         types.RegisterDocument,
     '\n    mutation Logout {\n        logout\n    }\n': types.LogoutDocument,
+    '\n    query GetConversationMessages($convId: ID!) {\n        getConversationMessages(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n':
+        types.GetConversationMessagesDocument,
+    '\n    subscription NewMessage($convId: ID!) {\n        newMessage(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt,\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n':
+        types.NewMessageDocument,
     '\n    mutation CreateConversation($convInput: CreateConversationDto!) {\n        createConversation(convInput: $convInput) {\n            createdAt\n            id\n            name\n            updatedAt\n            creatorId\n            messages {\n                content\n                createdAt\n                id\n                updatedAt\n            }\n            users {\n                createdAt\n                email\n                id\n                password\n                updatedAt\n                username\n            }\n        }\n    }\n':
         types.CreateConversationDocument,
     '\n    query GetUserConversations($userId: ID!) {\n        getUserConversations(userId: $userId) {\n            id\n            name\n            creatorId\n            users {\n                id\n                username\n            }\n            messages {\n                id\n                content\n                createdAt\n                updatedAt\n            }\n            createdAt\n            updatedAt\n        }\n    }\n':
@@ -31,6 +33,8 @@ const documents = {
         types.FindUserByNameDocument,
     '\n    mutation DeleteConversation($convId: ID!, $userId: ID!) {\n        deleteConversation(convId: $convId, userId: $userId) {\n            createdAt\n            id\n            name\n            creatorId\n            updatedAt\n        }\n    }\n':
         types.DeleteConversationDocument,
+    '\n    mutation LeaveConversation($convId: ID!, $userId: ID!) {\n        leaveConversation(convId: $convId, userId: $userId) {\n            createdAt\n            creatorId\n            id\n            name\n            updatedAt\n        }\n    }\n':
+        types.LeaveConversationDocument,
 }
 
 /**
@@ -47,12 +51,6 @@ const documents = {
  */
 export function graphql(source: string): unknown
 
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-    source: '\n    query GetConversationMessages($convId: ID!) {\n        getConversationMessages(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n',
-): (typeof documents)['\n    query GetConversationMessages($convId: ID!) {\n        getConversationMessages(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n']
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -87,6 +85,18 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
+    source: '\n    query GetConversationMessages($convId: ID!) {\n        getConversationMessages(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n',
+): (typeof documents)['\n    query GetConversationMessages($convId: ID!) {\n        getConversationMessages(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt\n            conversation {\n                createdAt\n                id\n                name\n                updatedAt\n            }\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n']
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+    source: '\n    subscription NewMessage($convId: ID!) {\n        newMessage(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt,\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n',
+): (typeof documents)['\n    subscription NewMessage($convId: ID!) {\n        newMessage(convId: $convId) {\n            content\n            createdAt\n            id\n            updatedAt,\n            sender {\n                createdAt\n                id\n                username\n                updatedAt\n            }\n        }\n    }\n']
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
     source: '\n    mutation CreateConversation($convInput: CreateConversationDto!) {\n        createConversation(convInput: $convInput) {\n            createdAt\n            id\n            name\n            updatedAt\n            creatorId\n            messages {\n                content\n                createdAt\n                id\n                updatedAt\n            }\n            users {\n                createdAt\n                email\n                id\n                password\n                updatedAt\n                username\n            }\n        }\n    }\n',
 ): (typeof documents)['\n    mutation CreateConversation($convInput: CreateConversationDto!) {\n        createConversation(convInput: $convInput) {\n            createdAt\n            id\n            name\n            updatedAt\n            creatorId\n            messages {\n                content\n                createdAt\n                id\n                updatedAt\n            }\n            users {\n                createdAt\n                email\n                id\n                password\n                updatedAt\n                username\n            }\n        }\n    }\n']
 /**
@@ -107,6 +117,12 @@ export function graphql(
 export function graphql(
     source: '\n    mutation DeleteConversation($convId: ID!, $userId: ID!) {\n        deleteConversation(convId: $convId, userId: $userId) {\n            createdAt\n            id\n            name\n            creatorId\n            updatedAt\n        }\n    }\n',
 ): (typeof documents)['\n    mutation DeleteConversation($convId: ID!, $userId: ID!) {\n        deleteConversation(convId: $convId, userId: $userId) {\n            createdAt\n            id\n            name\n            creatorId\n            updatedAt\n        }\n    }\n']
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+    source: '\n    mutation LeaveConversation($convId: ID!, $userId: ID!) {\n        leaveConversation(convId: $convId, userId: $userId) {\n            createdAt\n            creatorId\n            id\n            name\n            updatedAt\n        }\n    }\n',
+): (typeof documents)['\n    mutation LeaveConversation($convId: ID!, $userId: ID!) {\n        leaveConversation(convId: $convId, userId: $userId) {\n            createdAt\n            creatorId\n            id\n            name\n            updatedAt\n        }\n    }\n']
 
 export function graphql(source: string) {
     return (documents as any)[source] ?? {}
