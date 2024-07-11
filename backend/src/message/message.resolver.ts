@@ -12,12 +12,12 @@ import { MessageService } from './message.service';
 import { Message as MessageEntity } from './entities/message.entity';
 import { Message } from '@prisma/client';
 import { MessageInput } from './dto/message.dto';
-import { PrismaService } from 'src/prisma.service';
-import { User as UserEntity } from 'src/user/entity/user.entity';
-import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { PrismaService } from '../prisma.service';
+import { User as UserEntity } from '../user/entity/user.entity';
+import { Conversation } from '../conversation/entities/conversation.entity';
 import { PubSub } from 'graphql-subscriptions';
 import { UseGuards } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { GraphqlAuthGuard } from '../auth/graphql-auth.guard';
 
 @Resolver(() => MessageEntity)
 export class MessageResolver {

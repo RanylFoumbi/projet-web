@@ -11,14 +11,14 @@ import { UserService } from './user.service';
 import { User as UserEntity } from './entity/user.entity';
 import { Request } from 'express';
 import { UseGuards } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { GraphqlAuthGuard } from '../auth/graphql-auth.guard';
 import { createWriteStream } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { Conversation as ConversationEntity } from 'src/conversation/entities/conversation.entity';
+import { Conversation as ConversationEntity } from '../conversation/entities/conversation.entity';
 import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 
 @Resolver(() => UserEntity)
 export class UserResolver {
