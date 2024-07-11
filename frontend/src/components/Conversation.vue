@@ -104,6 +104,7 @@ const getConversationMessages = async (convId: String) => {
                 },
                 async ({ data, error }) => {
                     if (data && !error) {
+                        console.log(data)
                         messages.value = [...messages.value, data.newMessage]
                         scrollToBottom()
                     }
@@ -135,7 +136,6 @@ const sendMessage = async () => {
         })
 
         if (data && data?.value?.sendMessage) {
-            messages.value = [...messages.value, data.value.sendMessage]
             currentMessage.value = ''
             scrollToBottom()
         }

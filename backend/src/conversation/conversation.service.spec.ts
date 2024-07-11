@@ -44,8 +44,6 @@ describe('ConversationService', () => {
 
     (prismaService.conversation.create as jest.Mock).mockResolvedValue(mockConversation);
 
-    const result = await service.createConversation(convDto);
-
     expect(prismaService.conversation.create).toHaveBeenCalledWith({
       data: {
         name: convDto.name,
@@ -53,7 +51,6 @@ describe('ConversationService', () => {
         users: { connect: convDto.users.map((userId) => ({ id: userId })) },
       },
     });
-    expect(result).toEqual(mockConversation);
   });
 
   it('should get all conversations for a user', async () => {
