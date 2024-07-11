@@ -26,9 +26,9 @@ jobs:
         run: npm run lint && npm run format 
         working-directory: ./backend
 
-      # - name: Run tests
-      #   run: npm run test
-      #   working-directory: ./backend
+      - name: Run tests
+        run: npm run test
+        working-directory: ./backend
 
       - name: Build project
         run: npm run build
