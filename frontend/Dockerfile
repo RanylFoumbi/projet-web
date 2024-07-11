@@ -1,21 +1,18 @@
+# build stage
 FROM node:20-alpine
 
 RUN npm install -g http-server
 
 WORKDIR /app
 
-COPY ./frontend .
+COPY . .
 
 RUN rm -rf node_modules dist
 
 RUN npm install
 
-RUN npx patch-package
+RUN chmod +x build.sh
 
-RUN npm run build
+EXPOSE 8080
 
-RUN npm run preview
-
-CMD ["http-server", "dist", "-p", "5173"]
-
-EXPOSE 5173
+CMD [ "sh", "build.sh" ]
