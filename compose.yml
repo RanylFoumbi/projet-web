@@ -43,19 +43,19 @@ services:
     networks:
       - network
 
-  frontend:
-    container_name: "frontend"
-    image: rosvalde/frontend:latest
-    tty: true
-    env_file:
-      - .env
-    ports:
-      - 8080:8080
-    depends_on:
-      - backend
-    restart: on-failure
-    networks:
-      - network
+  # frontend:
+  #   container_name: "frontend"
+  #   image: rosvalde/frontend:latest
+  #   tty: true
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - backend
+  #   restart: on-failure
+  #   networks:
+  #     - network
 
 volumes:
   redis-data:

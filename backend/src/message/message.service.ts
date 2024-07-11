@@ -16,12 +16,18 @@ export class MessageService {
     let cachedMessages = await this.redisService.get(convId);
     cachedMessages = JSON.parse(cachedMessages);
     if (cachedMessages &&  Array.isArray(cachedMessages)) {
-      const messagesWithDates = cachedMessages.map((msg: any) => ({
-      ...msg,
-      createdAt: new Date(msg.createdAt),
-      updatedAt: new Date(msg.updatedAt),
-    }));
-    return messagesWithDates;
+      let convMessages = await this.prismaService.message.findMany({
+        where: {
+          conversationId: convId,
+        },
+      });
+      convMessages = [...convMessages, ...cachedMessages]
+      convMessages = convMessages.filter((message, index, self) =>
+          index === self.findIndex((m) => (
+              m.id === message.id
+          ))
+      );
+      return convMessages
     }
 
     const convMessages = await this.prismaService.message.findMany({
